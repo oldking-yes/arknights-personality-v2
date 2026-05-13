@@ -81,7 +81,7 @@ export default function App() {
       {/* Grid background */}
       <div className="fixed inset-0 pointer-events-none z-0"
         style={{
-          backgroundImage: 'linear-gradient(rgba(0,212,255,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,.025) 1px, transparent 1px)',
+          backgroundImage: 'linear-gradient(rgba(245,230,92,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(245,230,92,.025) 1px, transparent 1px)',
           backgroundSize: '40px 40px'
         }}
       />
@@ -92,7 +92,7 @@ export default function App() {
       {/* Particles */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {Array.from({length:20}).map((_,i) => (
-          <div key={i} className="absolute w-[2px] h-[2px] bg-cyan-500/20 rounded-full"
+          <div key={i} className="absolute w-[2px] h-[2px] bg-lemon/20 rounded-full"
             style={{
               left:`${Math.random()*100}%`, top:`${Math.random()*100}%`,
               animation:`pulse ${2+Math.random()*3}s ease-in-out infinite`,

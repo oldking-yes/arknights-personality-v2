@@ -10,17 +10,18 @@ interface ResultsProps {
 
 export default function Results({ result, onRestart }: ResultsProps) {
   const { op, compatible, userCoords } = result;
-  const cdn = 'https://cdn.statically.io/gh/Aceship/Arknight-Images/main/avatars/';
+  const cdn = 'https://cdn.jsdelivr.net/gh/fexli/ArknightsResource@latest/portrait/';
   const imgUrl = cdn + op.avatar + '.png';
 
   const shareResult = async () => {
-    const text = `我在罗德岛干员人格测试中匹配到了「${op.name}」！适配度 ${compatible}% —— 你也来测测看\nhttps://oldking-yes.github.io/arknights-personality-quiz/`;
+    const text = `我在罗德岛干员人格测试中匹配到了「${op.name}」！适配度 ${compatible}% —— 你也来测测看！`;
     if (navigator.share) {
       try { await navigator.share({ title: '罗德岛干员人格测试', text }); } catch {}
     } else {
       try {
         await navigator.clipboard.writeText(text);
         alert('结果已复制到剪贴板，快去分享吧！');
+        // Haptic-like visual feedback
       } catch {}
     }
   };
@@ -40,8 +41,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
       className="flex flex-col items-center justify-center min-h-screen px-4 py-8"
     >
       <div className="w-full max-w-md">
-
-        {/* Operator Card */}
+        {/* Share Card */}
         <motion.div
           initial={{ scale: 0.92, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
@@ -78,8 +78,10 @@ export default function Results({ result, onRestart }: ResultsProps) {
             className="font-mono text-[0.6rem] tracking-wider inline-block px-2 py-0.5 mt-1.5 relative z-10"
             style={{ color: op.color, borderColor: `${op.color}40`, border: '1px solid' }}
           >
-            {'★'.repeat(op.stars)} {op.clazz} · {op.tag}
+            {'★'.repeat(op.stars)} {op.clazz} &#xB7; {op.tag}
           </p>
+
+          {/* Match percentage */}
           <p className="font-mono text-sm tracking-wider mt-3 relative z-10">
             适配度{' '}
             <span className="text-xl font-bold" style={{ color: op.color }}>{compatible}</span>%
@@ -94,7 +96,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
           className="bg-slate-800/60 border border-slate-700/30 p-4 mb-3"
         >
           <p className="font-mono text-[0.6rem] tracking-[0.2em] text-slate-500 text-center mb-3 uppercase">
-            维度对比 · Dimension Comparison
+            维度对比 &#xB7; Dimension Comparison
           </p>
           <div className="flex flex-col gap-3">
             {items.map((item, i) => (
@@ -102,7 +104,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
                 <div className="flex justify-between items-center mb-1">
                   <span className="text-xs text-slate-400">{item.label}</span>
                   <span className="font-mono text-[0.6rem] text-slate-500">
-                    你 {item.user} · {op.name} {item.op}
+                    你 {item.user} &#xB7; {op.name} {item.op}
                   </span>
                 </div>
                 <div className="h-2 bg-slate-700/40 rounded-full overflow-hidden relative">
@@ -158,13 +160,13 @@ export default function Results({ result, onRestart }: ResultsProps) {
             onClick={shareResult}
             className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-white/5 border border-slate-700 text-slate-500 font-mono text-xs tracking-wider uppercase cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-slate-500 hover:text-white active:scale-95"
           >
-            ⊕ 分享结果
+            &#x2295; 分享结果
           </button>
           <button
             onClick={onRestart}
-            className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-cyan-600/15 border border-cyan-600/50 text-cyan-500 font-mono text-xs tracking-wider uppercase cursor-pointer transition-all duration-200 hover:bg-cyan-600/25 hover:border-cyan-500 active:scale-95"
+            className="inline-flex items-center gap-1.5 px-5 py-2.5 bg-lemon/15 border border-lemon/50 text-lemon font-mono text-xs tracking-wider uppercase cursor-pointer transition-all duration-200 hover:bg-lemon/25 hover:border-lemon active:scale-95"
           >
-            ↻ 重新测试
+            &#x21BB; 重新测试
           </button>
         </motion.div>
       </div>

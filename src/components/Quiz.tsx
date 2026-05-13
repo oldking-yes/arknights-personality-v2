@@ -35,17 +35,17 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-4 py-8">
       <div className="w-full max-w-md">
-        {/* Progress */}
+        {/* Dashboard-style Progress Bar */}
         <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 h-1 bg-slate-700/50 overflow-hidden rounded-full">
+          <div className="flex-1 h-1.5 bg-slate-700/50 overflow-hidden rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
             <motion.div
               className="h-full rounded-full"
-              style={{ background: 'linear-gradient(90deg, #006680, #00d4ff)' }}
+              style={{ background: 'linear-gradient(90deg, #A89A20, #F5E65C)' }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.4, ease: 'easeOut' }}
             />
           </div>
-          <span className="font-mono text-xs text-cyan-500 min-w-[3.5rem] text-right tabular-nums">
+          <span className="font-mono text-xs text-lemon min-w-[3.5rem] text-right tabular-nums tracking-wider">
             {currentQ + 1} / {QUESTIONS.length}
           </span>
         </div>
@@ -74,9 +74,9 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handleSelect(opt.dim, opt.val)}
-                    className="flex items-start gap-3 w-full p-3.5 sm:p-4 bg-slate-700/30 border border-slate-700/40 text-sm text-left leading-relaxed cursor-pointer transition-all duration-200 hover:border-cyan-600/50 hover:bg-cyan-500/5 active:border-cyan-500"
+                    className="flex items-start gap-3 w-full p-3.5 sm:p-4 bg-slate-700/30 border border-slate-700/40 text-sm text-left leading-relaxed cursor-pointer transition-all duration-200 hover:border-lemon/50 hover:bg-lemon/5 active:border-lemon"
                   >
-                    <span className="font-mono text-xs font-bold text-cyan-500 min-w-[1.2rem] pt-0.5 shrink-0">
+                    <span className="font-mono text-xs font-bold text-lemon min-w-[1.2rem] pt-0.5 shrink-0">
                       {labels[i]}
                     </span>
                     <span className="text-slate-300">{opt.txt}</span>
@@ -94,11 +94,11 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
               onClick={onPrev}
               className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-slate-700 text-slate-500 font-mono text-xs tracking-wider uppercase cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-slate-500 hover:text-white"
             >
-              ‹ 上一题
+              &#x2039; 上一题
             </button>
           ) : <div />}
           <span className="font-mono text-[0.6rem] text-slate-600 tracking-widest uppercase ml-auto">
-            键盘 1-4 选择 · Backspace 返回
+            键盘 1-4 &#xB7; Backspace 返回
           </span>
         </div>
       </div>
