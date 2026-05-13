@@ -1,10 +1,12 @@
+import type { AnswerRecord } from '../data/types';
+
 const KEYS = {
   scores: 'ak2_scores',
   current: 'ak2_current',
   history: 'ak2_history',
 } as const;
 
-export function saveProgress(scores: number[], currentQ: number, history: number[][]) {
+export function saveProgress(scores: number[], currentQ: number, history: AnswerRecord[]) {
   try {
     localStorage.setItem(KEYS.scores, JSON.stringify(scores));
     localStorage.setItem(KEYS.current, String(currentQ));
@@ -12,7 +14,7 @@ export function saveProgress(scores: number[], currentQ: number, history: number
   } catch {}
 }
 
-export function loadProgress(): { scores: number[]; currentQ: number; history: number[][] } | null {
+export function loadProgress(): { scores: number[]; currentQ: number; history: AnswerRecord[] } | null {
   try {
     const cur = localStorage.getItem(KEYS.current);
     if (cur === null) return null;
