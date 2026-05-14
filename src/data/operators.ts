@@ -2,7 +2,7 @@ import type { Operator } from './types';
 
 export const OPERATORS: Operator[] = [
   { id:'amiya', name:'阿米娅', title:'罗德岛公开领袖·近卫', clazz:'近卫', stars:6,
-    coords:[5,9,6,5,7], color:'#00b8ff', tag:'INFJ', avatar:'char_1001_amiya2_sale#16', portrait:'char_1001_amiya2_2.png',
+    coords:[5,9,6,5,7], color:'#00b8ff', tag:'', avatar:'char_1001_amiya2_sale#16', portrait:'skin/char_1001_amiya2_sale#16b.png',
     desc:'年仅14岁的卡特斯少女，罗德岛的公开领袖。拥有卓越的情感共鸣力和不输成年人的决断力。',
     epigraph:'"我始终相信，理解是通向和平的唯一道路。"',
     persona:[
@@ -17,7 +17,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['温柔的坚定','共感力','超越年龄','不肯放弃'] },
   { id:'chen', name:'赤刃明霄陈', title:'陈晖洁', clazz:'近卫', stars:6,
-    coords:[9,3,8,9,4], color:'#ff4444', tag:'ESTJ', avatar:'char_010_chen',
+    coords:[9,3,8,9,4], color:'#ff4444', tag:'', avatar:'char_010_chen',
     desc:'前龙门近卫局特别督察组组长。赤霄剑出鞘时，没有人分得清那道光来自剑刃还是她的决意。',
     epigraph:'"天喟之剑，当明则明。<br>不惧不退，无远弗行。"',
     persona:[
@@ -31,7 +31,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['规则守护者','雷厉风行','赤霄之心','黑白分明'] },
   { id:'silverash', name:'凛御银灰', title:'喀兰贸易董事长', clazz:'近卫', stars:6,
-    coords:[9,2,7,8,5], color:'#c0c0c0', tag:'ENTJ', avatar:'char_1045_svash2', portrait:'skin/char_1045_svash2_2b.png',
+    coords:[9,2,7,8,5], color:'#c0c0c0', tag:'', avatar:'char_1045_svash2', portrait:'skin/char_1045_svash2_2b.png',
     desc:'希瓦艾什家族族长。棋手思维——永远领先三步。',
     epigraph:'"最好的防御不是躲在盾牌后面，是让别人不敢攻击你。"',
     persona:[
@@ -46,7 +46,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['棋手思维','深谋远虑','暴风雪中心','不怒自威'] },
   { id:'texas', name:'缄默德克萨斯', title:'企鹅物流干员', clazz:'先锋', stars:6,
-    coords:[7,3,8,4,3], color:'#ff8c00', tag:'ISTP', avatar:'char_1028_texas2',
+    coords:[7,3,8,4,3], color:'#ff8c00', tag:'', avatar:'char_1028_texas2',
     desc:'企鹅物流干员。沉默、精准、从不失手。德克萨斯家族最后的幸存者。',
     epigraph:'"如果摆脱过去的方法只有粉碎它，<br>那我就会粉碎它。就这么简单。"',
     persona:[
@@ -61,7 +61,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['沉默的利刃','行动派','不回头','企鹅物流'] },
   { id:'lappland', name:'荒芜拉普兰德', title:'萨卢佐家族前任', clazz:'近卫', stars:6,
-    coords:[4,1,9,3,5], color:'#ff60a0', tag:'ENTP', avatar:'char_1038_whitw2',
+    coords:[4,1,9,3,5], color:'#ff60a0', tag:'', avatar:'char_1038_whitw2',
     desc:'叙拉古萨卢佐家族前任继承人。如今只遵循自己的规则。',
     epigraph:'"秩序是弱者的借口。<br>真正的自由，是拥抱混沌。"',
     persona:[
@@ -76,7 +76,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['混沌之子','笑对一切','自由的疯子','白狼'] },
   { id:'exusiai', name:'新约能天使', title:'企鹅物流信使·圣徒', clazz:'狙击', stars:6,
-    coords:[3,7,8,2,9], color:'#ff2222', tag:'ENFP', avatar:'char_1041_angel2',
+    coords:[3,7,8,2,9], color:'#ff2222', tag:'', avatar:'char_1041_angel2',
     desc:'企鹅物流最开朗的信使。铳声和笑声一起响起。',
     epigraph:'"快乐不是一种状态，是一种选择。而我选择快乐。"',
     persona:[
@@ -91,7 +91,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['快乐子弹','阳光制造机','天使的微笑','铳与笑'] },
   { id:'skadi', name:'浊心斯卡蒂', title:'阿戈尔猎人', clazz:'近卫', stars:6,
-    coords:[6,2,9,3,2], color:'#3a5fe5', tag:'INTJ', avatar:'char_1012_skadi2',
+    coords:[6,2,9,3,2], color:'#3a5fe5', tag:'', avatar:'char_1012_skadi2',
     desc:'深海猎人。沉默的巨力。另一条时间线上与海洋融为一体的她。',
     epigraph:'"我在等你，博士。<br>我等你太久，太久，甚至已经忘了为什么要在这里等你。"',
     persona:[
@@ -106,7 +106,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['深海的沉默','独行者','巨力','阿戈尔'] },
   { id:'saria', name:'塞雷娅', title:'莱茵生命防卫主任', clazz:'重装', stars:5,
-    coords:[8,6,6,9,6], color:'#ff8c42', tag:'ISTJ', avatar:'char_202_demkni',
+    coords:[8,6,6,9,6], color:'#ff8c42', tag:'', avatar:'char_202_demkni',
     desc:'莱茵生命防卫科主任。一面沉默的盾。',
     epigraph:'"守护者的职责不是站在盾牌后面，是成为盾牌本身。"',
     persona:[
@@ -121,7 +121,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['不破之盾','沉默的守护者','责任即信仰','坚实的背影'] },
   { id:'blaze', name:'烛煌', title:'罗德岛精英干员', clazz:'近卫', stars:6,
-    coords:[4,6,9,3,8], color:'#ff5500', tag:'ESFP', avatar:'char_1040_blaze2',
+    coords:[4,6,9,3,8], color:'#ff5500', tag:'', avatar:'char_1040_blaze2',
     desc:'罗德岛精英干员。火神血脉。燃烧是她的本能。',
     epigraph:'"燃烧不是毁灭。燃烧是证明我活着的方式。"',
     persona:[
@@ -136,7 +136,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['不灭的火焰','热血沸腾','勇往直前','电锯轰鸣'] },
   { id:'kaltsit', name:'凯尔希·思衡托', title:'罗德岛医疗主管', clazz:'医疗', stars:6,
-    coords:[9,3,5,8,3], color:'#44cc88', tag:'INTP', avatar:'char_003_kalts_2', portrait:'char_003_kalts_2.png',
+    coords:[9,3,5,8,3], color:'#44cc88', tag:'', avatar:'char_003_kalts_2', portrait:'char_003_kalts_2.png',
     desc:'罗德岛医疗部负责人。Mon3tr 是她最温和的一面。',
     epigraph:'"真理不需要被任何人喜欢。它只需要被知道。"',
     persona:[
@@ -151,7 +151,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['理性的化身','Mon3tr','锋利而正确','深不可测'] },
   { id:'mostima', name:'莫斯提马', title:'企鹅物流外勤', clazz:'术师', stars:6,
-    coords:[5,6,4,6,6], color:'#6688ff', tag:'INFP', avatar:'char_213_mostma',
+    coords:[5,6,4,6,6], color:'#6688ff', tag:'', avatar:'char_213_mostma',
     desc:'企鹅物流外勤干员。控制时间的源石技艺。永远在微笑。',
     epigraph:'"时间是一条河。我只想在岸边坐一会儿。"',
     persona:[
@@ -166,7 +166,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['时间旅人','优雅的距离','轻松面具','通透'] },
   { id:'sutr', name:'史尔特尔', title:'流浪战士', clazz:'近卫', stars:6,
-    coords:[5,2,8,4,3], color:'#cc3388', tag:'INTJ', avatar:'char_350_surtr',
+    coords:[5,2,8,4,3], color:'#cc3388', tag:'', avatar:'char_350_surtr',
     desc:'手持莱瓦汀的萨卡兹战士。失忆者。孤独的旅人。',
     epigraph:'"记忆是枷锁。扔掉它，才能走得更远。"',
     persona:[
@@ -181,7 +181,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['莱瓦汀','失忆的旅人','冷漠外壳','孤独的燃烧'] },
   { id:'angelina', name:'安洁莉娜', title:'信使·高中女生', clazz:'辅助', stars:5,
-    coords:[3,9,6,5,8], color:'#ff88cc', tag:'ENFJ', avatar:'char_291_aglina',
+    coords:[3,9,6,5,8], color:'#ff88cc', tag:'', avatar:'char_291_aglina',
     desc:'普通高中女生，兼职企鹅物流信使。让她身边的人感到安心。',
     epigraph:'"每个人都需要被温柔对待。哪怕只是有人愿意听你说说话。"',
     persona:[
@@ -196,7 +196,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['温柔的引力','治愈','善良的勇气','信使'] },
   { id:'hoshiguma', name:'斩业星熊', title:'龙门近卫局干员', clazz:'重装', stars:5,
-    coords:[6,6,5,8,7], color:'#44dd44', tag:'ISFJ', avatar:'char_1044_hsgma2',
+    coords:[6,6,5,8,7], color:'#44dd44', tag:'', avatar:'char_1044_hsgma2',
     desc:'龙门近卫局干员。陈的搭档。般若的持有者。',
     epigraph:'"真正的勇气不是无所畏惧。是带着恐惧，仍然站在那里。"',
     persona:[
@@ -211,7 +211,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['不动的山','忠诚的守护者','沉默的力量','般若'] },
   { id:'ifrit', name:'伊芙利特', title:'莱茵生命实验体', clazz:'术师', stars:5,
-    coords:[3,4,9,2,4], color:'#ff4400', tag:'ESTP', avatar:'char_134_ifrit',
+    coords:[3,4,9,2,4], color:'#ff4400', tag:'', avatar:'char_134_ifrit',
     desc:'莱茵生命的实验体。烈焰掌控者。一个渴望拥抱的孩子。',
     epigraph:'"他们说我是火。但火也有想被人抱紧的时候。"',
     persona:[
@@ -226,7 +226,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['烈焰','渴望理解','自由','赫默的拥抱'] },
   { id:'w', name:'维什戴尔', title:'罗德岛精英干员', clazz:'狙击', stars:6,
-    coords:[7,3,8,3,7], color:'#dd2222', tag:'ENTP', avatar:'char_1035_wisdel',
+    coords:[7,3,8,3,7], color:'#dd2222', tag:'', avatar:'char_1035_wisdel',
     desc:'前整合运动干部、萨卡兹佣兵。特蕾西娅赐予的名字，意为"渴望归处"。',
     epigraph:'"Wiš\'adel——我是签在这里吗？<br>殿下说这个名字的意思是\'渴望归处\'，但我从不许愿。"',
     persona:[

@@ -265,7 +265,7 @@ function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
             <p className="font-serif-cn text-sm tracking-[0.08em] text-warm-muted mb-3">{op.title}</p>
             <div className="font-serif-en text-xs tracking-widest px-3 py-1 mb-2"
               style={{ color: op.color, border: `1px solid ${op.color}40` }}>
-              {op.tag} · {op.clazz}
+              {op.clazz}
             </div>
           </motion.div>
         </div>

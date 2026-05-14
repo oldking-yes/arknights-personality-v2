@@ -164,7 +164,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
               </p>
               <div className="font-serif-en text-xs tracking-widest px-3 py-1 mb-4"
                 style={{ color: op.color, border: `1px solid ${op.color}40` }}>
-                {op.tag} · {op.clazz}
+                {op.clazz}
               </div>
               <div className="ornament" style={{ margin: '8px 0' }}>· · ·</div>
             </motion.div>
