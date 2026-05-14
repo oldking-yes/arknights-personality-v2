@@ -1,12 +1,33 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useState } from 'react';
 
 interface IntroProps {
   onStart: () => void;
   onRandom: () => void;
   onShowAll: () => void;
+  onPrtsToggle: () => void;
 }
 
-export default function Intro({ onStart, onRandom, onShowAll }: IntroProps) {
+const HAND_WHISPERS = [
+  '「不准忘记我。」',
+  '「我在时间的尽头等你。」',
+  '「信号源……来自██。」',
+  '「就算海洋沸腾，我们也一样能再见面。」',
+  '「你曾许诺，当群星的余晖再次坠向泰拉——」',
+  '「源石语言解码中…… 进度 87%」',
+];
+
+export default function Intro({ onStart, onRandom, onShowAll, onPrtsToggle }: IntroProps) {
+  const [whisper, setWhisper] = useState('');
+  const [whisperKey, setWhisperKey] = useState(0);
+
+  const handleHandClick = () => {
+    const msg = HAND_WHISPERS[Math.floor(Math.random() * HAND_WHISPERS.length)];
+    setWhisper(msg);
+    setWhisperKey(k => k + 1);
+    setTimeout(() => setWhisper(''), 3500);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -14,9 +35,10 @@ export default function Intro({ onStart, onRandom, onShowAll }: IntroProps) {
       exit={{ opacity: 0 }}
       className="flex flex-col items-center justify-center min-h-screen px-9 py-20 text-center relative overflow-hidden"
     >
-      {/* PRTS hex background decoration */}
-      <div className="fixed pointer-events-none select-none prts-hex"
-        style={{ color: 'rgba(74, 143, 228, 0.12)', top: '10%', left: '5%', width: '120px', height: '120px' }}>
+      {/* PRTS hex — clickable to invoke terminal */}
+      <button onClick={onPrtsToggle}
+        className="fixed prts-hex cursor-pointer select-none z-10 transition-all duration-300 hover:scale-110 hover:opacity-80"
+        style={{ color: 'rgba(74, 143, 228, 0.2)', top: '10%', left: '5%', width: '120px', height: '120px' }}>
         <svg viewBox="0 0 100 100" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="0.8">
           <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" />
           <polygon points="50,20 80,35 80,65 50,80 20,65 20,35" strokeWidth="0.4" />
@@ -25,7 +47,10 @@ export default function Intro({ onStart, onRandom, onShowAll }: IntroProps) {
           <line x1="27.5" y1="17.5" x2="72.5" y2="82.5" strokeWidth="0.3" />
           <line x1="72.5" y1="17.5" x2="27.5" y2="82.5" strokeWidth="0.3" />
         </svg>
-      </div>
+        <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 font-mono text-[0.4rem] tracking-[0.2em] text-blue-accent/30 whitespace-nowrap">
+          PRTS
+        </span>
+      </button>
       <div className="fixed pointer-events-none select-none prts-hex"
         style={{ color: 'rgba(245, 230, 92, 0.06)', bottom: '15%', right: '8%', width: '80px', height: '80px', animationDelay: '2s' }}>
         <svg viewBox="0 0 100 100" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="0.8">
@@ -34,9 +59,10 @@ export default function Intro({ onStart, onRandom, onShowAll }: IntroProps) {
         </svg>
       </div>
 
-      {/* Hand reaching motif */}
-      <div className="fixed pointer-events-none select-none hand-reach"
-        style={{ color: 'rgba(74, 143, 228, 0.08)', bottom: '8%', left: '3%', width: '60px', height: '80px' }}>
+      {/* Hand reaching motif — clickable for Priestess whisper */}
+      <button onClick={handleHandClick}
+        className="fixed hand-reach cursor-pointer select-none z-10 transition-all duration-300 hover:scale-110 hover:opacity-80"
+        style={{ color: 'rgba(74, 143, 228, 0.12)', bottom: '8%', left: '3%', width: '60px', height: '80px' }}>
         <svg viewBox="0 0 60 80" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.2">
           <path d="M30,5 C30,5 20,20 15,35 C12,45 16,52 22,52 C26,52 28,48 28,48
             L28,62 C28,68 32,72 34,72 C36,72 38,68 38,62 L38,48
@@ -44,7 +70,30 @@ export default function Intro({ onStart, onRandom, onShowAll }: IntroProps) {
           />
           <path d="M22,52 C18,55 14,58 18,62 C22,66 28,62 28,62" strokeWidth="0.8" />
         </svg>
-      </div>
+      </button>
+
+      {/* Priestess whisper toast */}
+      <AnimatePresence>
+        {whisper && (
+          <motion.div
+            key={whisperKey}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="fixed bottom-[18%] left-[calc(3%+70px)] z-20 pointer-events-none"
+          >
+            <div className="font-mono text-[0.55rem] tracking-wider italic px-3 py-1.5"
+              style={{
+                color: '#6688ff',
+                background: 'rgba(13,15,17,0.85)',
+                borderLeft: '2px solid rgba(102,136,255,0.3)',
+                maxWidth: '200px',
+              }}>
+              {whisper}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
       <div className="w-full max-w-xs">
         <motion.div
           initial={{ y: 20, opacity: 0 }}

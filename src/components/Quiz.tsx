@@ -36,7 +36,7 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
       <div className="w-full max-w-md">
         {/* header: section + progress */}
         <div className="flex justify-between items-center mb-2">
-          <span className="font-serif-en italic text-xs tracking-[0.15em] text-warm-dim">战术情境</span>
+          <span className="font-serif-en italic text-xs tracking-[0.15em] text-warm-dim">TACTICAL ASSESSMENT</span>
           <span className="font-serif-en text-xs tracking-[0.1em] text-warm-muted">
             {String(currentQ + 1).padStart(2, '0')} / {String(QUESTIONS.length).padStart(2, '0')}
           </span>
@@ -60,8 +60,8 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3 }}
           >
-            <div className="mb-1 font-serif-en text-xs italic tracking-[0.1em] text-warm-dim">
-              Question {String(currentQ + 1).padStart(2, '0')}
+            <div className="mb-1 font-mono text-[0.55rem] tracking-[0.2em] text-warm-dim/50">
+              ⌥ #{String(currentQ + 1).padStart(2, '0')}
             </div>
             <p className="text-lg font-medium leading-relaxed text-warm-white mb-8">
               {question.text}
@@ -99,8 +99,8 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
               ← 上一题
             </button>
           ) : <div />}
-          <span className="font-serif-en text-[0.55rem] tracking-widest text-warm-dim/60">
-            1–4 选择 · Backspace 返回
+          <span className="font-mono text-[0.5rem] tracking-[0.2em] text-warm-dim/40">
+            [1–4] SELECT · [BKSP] RETURN
           </span>
         </div>
       </div>

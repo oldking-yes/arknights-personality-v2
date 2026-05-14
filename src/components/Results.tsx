@@ -125,7 +125,8 @@ export default function Results({ result, onRestart }: ResultsProps) {
 
   const shareUrl = `${window.location.origin}/arknights-personality-v2/?c=${userCoords.join(',')}`;
 
-  const shareText = `我在罗德岛干员人格测试中匹配到了「${op.name}」！适配度 ${compatible}%\n「${op.title}」\n—— 你也来测测看，看看哪位干员与你灵魂共振。`;
+  const shareIntro = compatible >= 80 ? '灵魂共振' : compatible >= 60 ? '深度匹配' : '意外匹配';
+  const shareText = `🔮 罗德岛人格测试 · ${shareIntro}\n我与「${op.name}」的适配度高达 ${compatible}%\n「${op.title}」\n\n来测测看你会匹配到哪位干员 → ${shareUrl}`;
 
   const isWechat = /MicroMessenger/i.test(navigator.userAgent);
 
@@ -279,12 +280,15 @@ export default function Results({ result, onRestart }: ResultsProps) {
     setShareImg(dataUrl);
     setShowShare(true);
     setShareLoading(false);
+  }, [op, compatible, userCoords, ranking, shareLoading, shareUrl]);
 
+  const downloadShareCard = useCallback(() => {
+    if (!shareImg) return;
     const a = document.createElement('a');
     a.download = `arknights-${op.id}.png`;
-    a.href = dataUrl;
+    a.href = shareImg;
     a.click();
-  }, [op, compatible, userCoords, ranking, shareLoading, shareUrl]);
+  }, [shareImg, op.id]);
 
   const handleWebShare = useCallback(async () => {
     if (navigator.share) {
@@ -516,7 +520,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
               <img src={shareImg} alt="分享卡片" className="max-w-[90%] max-h-[70vh] rounded shadow-2xl" />
               <div className="mt-6 flex gap-3">
                 <button
-                  onClick={generateShareCard}
+                  onClick={downloadShareCard}
                   className="px-8 py-3 bg-white text-deep-900 font-serif-cn text-sm tracking-[0.2em] cursor-pointer transition-all duration-300 hover:bg-warm-white"
                 >
                   保存图片

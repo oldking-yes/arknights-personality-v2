@@ -45,6 +45,7 @@ export default function App() {
     console.log('%c🟦 R.I. v2.0  罗德岛档案系统', 'font-size:16px;font-weight:bold;color:#E8E3D8');
     console.log('%c「记录即是存在。档案即是历史。」——凯尔希', 'font-size:12px;color:#8A8270');
     console.log('%c🔍 在 Endfield 的深处，有什么正在注视着你……', 'font-size:11px;color:#6A6050');
+    console.log('%c💡 试试点击页面上的六边形和手部图案', 'font-size:10px;color:#5A5040');
 
     const priestessLines = [
       ['%c𐂂 PRTS: 检测到博士的访问记录', 'color:#4A8FE4;font-size:11px'],
@@ -203,7 +204,7 @@ export default function App() {
 
       <div className="relative z-10 w-full max-w-lg mx-auto">
         <AnimatePresence mode="wait">
-          {stage==='intro' && <Intro key="intro" onStart={startQuiz} onRandom={randomQuiz} onShowAll={showAll} />}
+          {stage==='intro' && <Intro key="intro" onStart={startQuiz} onRandom={randomQuiz} onShowAll={showAll} onPrtsToggle={() => setPrtsActive(a => !a)} />}
           {stage==='quiz' && currentQ < TOTAL && <Quiz key="quiz" currentQ={currentQ} onAnswer={handleAnswer} onPrev={handlePrev} />}
           {stage==='results' && result && <Results key="results" result={result} onRestart={restart} />}
           {stage==='debug' && <DebugView key="debug" onBack={restart} />}
