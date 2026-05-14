@@ -16,7 +16,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
   const { op, compatible, userCoords } = result;
   const [heroFallback, setHeroFallback] = useState(false);
   const charUrl = op.portrait
-    ? (op.portrait.startsWith('skin/') ? baseCdn + op.portrait : charCdn + op.portrait)
+    ? (op.portrait.startsWith('skin/') ? baseCdn + op.portrait.replace('#','%23') : charCdn + op.portrait)
     : heroFallback
       ? charCdn + op.avatar + '_1.png'
       : baseCdn + 'skin/' + op.avatar.replace('#','%23') + '_2b.png';

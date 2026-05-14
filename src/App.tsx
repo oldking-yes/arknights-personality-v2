@@ -223,7 +223,7 @@ function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
   const avatarUrl = baseCdn + 'avatar/' + op.avatar.replace('#','%23') + '.png';
   const [heroFallback, setHeroFallback] = useState(false);
   const portraitUrl = op.portrait
-    ? (op.portrait.startsWith('skin/') ? baseCdn + op.portrait : baseCdn + 'portrait/' + op.portrait)
+    ? (op.portrait.startsWith('skin/') ? baseCdn + op.portrait.replace('#','%23') : baseCdn + 'portrait/' + op.portrait)
     : heroFallback
       ? baseCdn + 'portrait/' + op.avatar + '_1.png'
       : baseCdn + 'skin/' + op.avatar.replace('#','%23') + '_2b.png';
