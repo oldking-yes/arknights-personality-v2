@@ -152,7 +152,7 @@ export default function App() {
 }
 
 function DebugView({ onBack }: { onBack: () => void }) {
-  const [selected, setSelected] = useState<Operator | null>(null);
+  const [selected] = useState<Operator | null>(null);
   const cdn = 'https://raw.githubusercontent.com/Aceship/Arknight-Images/main/avatars/';
 
   if (selected) return null;

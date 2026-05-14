@@ -9,12 +9,10 @@ interface ResultsProps {
   onRestart: () => void;
 }
 
-const avatarCdn = 'https://raw.githubusercontent.com/Aceship/Arknight-Images/main/avatars/';
 const charCdn = 'https://raw.githubusercontent.com/Aceship/Arknight-Images/main/characters/';
 
 export default function Results({ result, onRestart }: ResultsProps) {
   const { op, compatible, userCoords } = result;
-  const avatarUrl = avatarCdn + op.avatar + '.png';
   const charUrl = charCdn + op.avatar + '_1.png';
   const [showShare, setShowShare] = useState(false);
   const [shareImg, setShareImg] = useState('');
@@ -303,7 +301,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
               <img src={shareImg} alt="分享卡片" className="max-w-[90%] max-h-[70vh] rounded shadow-2xl" />
               <div className="mt-6 flex gap-3">
                 <button
-                  onClick={downloadCard}
+                  onClick={generateShareCard}
                   className="px-8 py-3 bg-white text-deep-900 font-serif-cn text-sm tracking-[0.2em] cursor-pointer transition-all duration-300 hover:bg-warm-white"
                 >
                   保存图片
