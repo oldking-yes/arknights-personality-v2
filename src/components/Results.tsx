@@ -18,7 +18,7 @@ function charUrl(op: { portrait?: string; avatar: string }, fallback: boolean) {
       : IMG + 'portrait/' + op.portrait;
   }
   return fallback
-    ? IMG + 'portrait/' + op.avatar + '_1.png'
+    ? IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png'
     : IMG + 'skin/' + op.avatar.replace('#', '%23') + '_2b.png';
 }
 
@@ -145,21 +145,22 @@ export default function Results({ result, onRestart }: ResultsProps) {
     ctx.fillStyle = '#0D0F11';
     ctx.fillRect(0, 0, W, H);
 
-    // Hex pattern bg
-    ctx.strokeStyle = 'rgba(232,227,216,0.03)';
-    ctx.lineWidth = 0.5;
+    // Hex pattern bg — single path for all hexagons (520 → 1 draw call)
+    ctx.beginPath();
     for (let r = 0; r < 26; r++) {
       for (let c = 0; c < 20; c++) {
         const cx = c * 48 + (r % 2) * 24, cy = r * 40;
-        ctx.beginPath();
         for (let i = 0; i < 6; i++) {
           const a = (i * 60 - 30) * Math.PI / 180;
           const x = cx + 20 * Math.cos(a), y = cy + 20 * Math.sin(a);
           i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
         }
-        ctx.closePath(); ctx.stroke();
+        ctx.closePath();
       }
     }
+    ctx.strokeStyle = 'rgba(232,227,216,0.03)';
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
 
     // Radial glow
     const grad = ctx.createRadialGradient(400, 160, 20, 400, 160, 380);
@@ -276,7 +277,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
     ctx.font = '11px "Cormorant Garamond", serif';
     ctx.fillText(shareUrl, 400, H - 38);
 
-    const dataUrl = canvas.toDataURL('image/png');
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
     setShareImg(dataUrl);
     setShowShare(true);
     setShareLoading(false);
@@ -324,7 +325,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
             {!heroLoaded && <div className="absolute inset-0 skeleton" />}
             <img
               src={url}
-              alt=""
+              alt={op.name}
               className="w-full h-full object-cover opacity-70"
               style={{ filter: 'brightness(0.55) saturate(1.1)', objectPosition: 'center 25%' }}
               onLoad={() => setHeroLoaded(true)}
@@ -353,6 +354,9 @@ export default function Results({ result, onRestart }: ResultsProps) {
               </h2>
               <p className="font-serif-cn text-base tracking-[0.08em] text-warm-muted mb-6">
                 {op.title}
+              </p>
+              <p className="font-serif-cn text-sm leading-relaxed text-warm-muted/80 max-w-xs mb-5">
+                {op.desc}
               </p>
               <div className="font-serif-en text-xs tracking-widest px-3 py-1 mb-4"
                 style={{ color: op.color, border: `1px solid ${op.color}40` }}>

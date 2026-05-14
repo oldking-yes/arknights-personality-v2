@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react';
+import { useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { QUESTIONS } from '../data/questions';
 import type { Question } from '../data/types';
@@ -11,9 +11,21 @@ interface QuizProps {
 
 const labels = ['A', 'B', 'C', 'D'];
 
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
 export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
   const question: Question = QUESTIONS[currentQ];
   const progress = ((currentQ + 1) / QUESTIONS.length) * 100;
+
+  // Shuffle options once per question to prevent A=3,B=2,C=1,D=0 pattern
+  const shuffledOpts = useMemo(() => shuffle(question.opts), [question]);
 
   const handleSelect = useCallback((dim: number, val: number) => {
     onAnswer(dim, val);
@@ -22,14 +34,14 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const k = parseInt(e.key);
-      if (k >= 1 && k <= 4 && question.opts[k - 1]) {
-        handleSelect(question.opts[k - 1].dim, question.opts[k - 1].val);
+      if (k >= 1 && k <= 4 && shuffledOpts[k - 1]) {
+        handleSelect(shuffledOpts[k - 1].dim, shuffledOpts[k - 1].val);
       }
       if (e.key === 'Backspace' && currentQ > 0) onPrev();
     };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [question, handleSelect, currentQ, onPrev]);
+  }, [shuffledOpts, handleSelect, currentQ, onPrev]);
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen px-6 py-8">
@@ -68,7 +80,7 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
             </p>
 
             <div className="flex flex-col gap-3">
-              {question.opts.map((opt, i) => (
+              {shuffledOpts.map((opt, i) => (
                 <motion.button
                   key={`${currentQ}-${i}`}
                   initial={{ opacity: 0, y: 12 }}

@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 
 interface IntroProps {
   onStart: () => void;
@@ -20,11 +20,37 @@ const HAND_WHISPERS = [
 export default function Intro({ onStart, onRandom, onShowAll, onPrtsToggle }: IntroProps) {
   const [whisper, setWhisper] = useState('');
   const [whisperKey, setWhisperKey] = useState(0);
+  const handRef = useRef<HTMLButtonElement>(null);
+  const [toastPos, setToastPos] = useState({ left: 0, top: 0 });
+
+  // Console easter egg — priestess messages, only on intro page
+  useEffect(() => {
+    const priestessLines = [
+      ['%c𐂂 PRTS: 检测到博士的访问记录', 'color:#4A8FE4;font-size:11px'],
+      ['%c𐂂 「不准忘记我。」', 'color:#6688ff;font-size:13px;font-style:italic'],
+      ['%c𐂂 PRTS: 信号来源——██ ████ ███', 'color:#4A8FE4;font-size:11px'],
+      ['%c𐂂 「就算海洋沸腾、大气消失，我们也一样能再见面。」', 'color:#6688ff;font-size:13px;font-style:italic'],
+      ['%c𐂂 PRTS: 源石语言解码中…… 进度 87%', 'color:#4A8FE4;font-size:11px'],
+      ['%c𐂂 通信终端: ▇▇▇▇ 正在连接……', 'color:#6A6050;font-size:10px'],
+      ['%c𐂂 你曾许诺，当群星的余晖再次坠向泰拉——你会为我停下那束光。', 'color:#6688ff;font-size:12px;font-style:italic'],
+      ['%c𐂂 PRTS: 连接丢失。', 'color:#4A8FE4;font-size:11px'],
+    ];
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    priestessLines.forEach((line, i) => {
+      timers.push(setTimeout(() => console.log(line[0], line[1]), 3000 + i * 4000));
+    });
+    return () => timers.forEach(clearTimeout);
+  }, []);
 
   const handleHandClick = () => {
     const msg = HAND_WHISPERS[Math.floor(Math.random() * HAND_WHISPERS.length)];
     setWhisper(msg);
     setWhisperKey(k => k + 1);
+    // Position toast relative to hand button
+    if (handRef.current) {
+      const rect = handRef.current.getBoundingClientRect();
+      setToastPos({ left: rect.right + 12, top: rect.top });
+    }
     setTimeout(() => setWhisper(''), 3500);
   };
 
@@ -60,7 +86,7 @@ export default function Intro({ onStart, onRandom, onShowAll, onPrtsToggle }: In
       </div>
 
       {/* Hand reaching motif — clickable for Priestess whisper */}
-      <button onClick={handleHandClick}
+      <button ref={handRef} onClick={handleHandClick}
         className="fixed hand-reach cursor-pointer select-none z-10 transition-all duration-300 hover:scale-110 hover:opacity-80"
         style={{ color: 'rgba(74, 143, 228, 0.12)', bottom: '8%', left: '3%', width: '60px', height: '80px' }}>
         <svg viewBox="0 0 60 80" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.2">
@@ -72,7 +98,7 @@ export default function Intro({ onStart, onRandom, onShowAll, onPrtsToggle }: In
         </svg>
       </button>
 
-      {/* Priestess whisper toast */}
+      {/* Priestess whisper toast — positioned dynamically relative to hand */}
       <AnimatePresence>
         {whisper && (
           <motion.div
@@ -80,7 +106,8 @@ export default function Intro({ onStart, onRandom, onShowAll, onPrtsToggle }: In
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="fixed bottom-[18%] left-[calc(3%+70px)] z-20 pointer-events-none"
+            className="fixed z-20 pointer-events-none"
+            style={{ left: toastPos.left, top: toastPos.top }}
           >
             <div className="font-mono text-[0.55rem] tracking-wider italic px-3 py-1.5"
               style={{

@@ -46,23 +46,6 @@ export default function App() {
     console.log('%c「记录即是存在。档案即是历史。」——凯尔希', 'font-size:12px;color:#8A8270');
     console.log('%c🔍 在 Endfield 的深处，有什么正在注视着你……', 'font-size:11px;color:#6A6050');
     console.log('%c💡 试试点击页面上的六边形和手部图案', 'font-size:10px;color:#5A5040');
-
-    const priestessLines = [
-      ['%c𐂂 PRTS: 检测到博士的访问记录', 'color:#4A8FE4;font-size:11px'],
-      ['%c𐂂 「不准忘记我。」', 'color:#6688ff;font-size:13px;font-style:italic'],
-      ['%c𐂂 PRTS: 信号来源——██ ████ ███', 'color:#4A8FE4;font-size:11px'],
-      ['%c𐂂 「就算海洋沸腾、大气消失，我们也一样能再见面。」', 'color:#6688ff;font-size:13px;font-style:italic'],
-      ['%c𐂂 PRTS: 源石语言解码中…… 进度 87%', 'color:#4A8FE4;font-size:11px'],
-      ['%c𐂂 通信终端: ▇▇▇▇ 正在连接……', 'color:#6A6050;font-size:10px'],
-      ['%c𐂂 你曾许诺，当群星的余晖再次坠向泰拉——你会为我停下那束光。', 'color:#6688ff;font-size:12px;font-style:italic'],
-      ['%c𐂂 PRTS: 连接丢失。', 'color:#4A8FE4;font-size:11px'],
-    ];
-
-    const timers: ReturnType<typeof setTimeout>[] = [];
-    priestessLines.forEach((line, i) => {
-      timers.push(setTimeout(() => console.log(line[0], line[1]), 3000 + i * 4000));
-    });
-    return () => timers.forEach(clearTimeout);
   }, []);
 
   useEffect(() => {
@@ -229,7 +212,11 @@ export default function App() {
           onClick={() => setPrtsActive(false)}
           style={{ color: '#4A8FE4' }}>
           <div className="max-w-lg mx-auto" onClick={e => e.stopPropagation()}>
-            <div className="text-[10px] tracking-widest mb-4" style={{ color: '#4A8FE460' }}>PRTS TERMINAL v2.0.1</div>
+            <div className="flex items-center justify-between mb-4">
+              <span className="text-[10px] tracking-widest" style={{ color: '#4A8FE460' }}>PRTS TERMINAL v2.0.1</span>
+              <button onClick={() => setPrtsActive(false)}
+                className="text-warm-white/60 hover:text-warm-white text-xl leading-none cursor-pointer transition-colors">&times;</button>
+            </div>
             <div className="border border-white/10 p-6 mb-4 bg-black/30">
               {[
                 '> PRTS Core Online',
@@ -248,11 +235,11 @@ export default function App() {
                 `> 当前干员档案: ${OPERATORS.length} 份`,
                 '> PRTS 协议 · 罗德岛战术终端',
                 '> 点击任意处关闭 █',
-              ].map((line, i) => (
+              ].map((line, i, arr) => (
                 <div key={i} className={`${line.startsWith('> "') ? 'italic' : ''}`}
                   style={{ opacity: 0.9 - i * 0.03, color: line.includes('错误') ? '#ff4444' : line.includes('WARNING') ? '#ffaa00' : line.includes('"') ? '#6688ff' : '#4A8FE4' }}>
                   {line}
-                  {i === 0 && <span className="prts-cursor" />}
+                  {i === arr.length - 1 && <span className="prts-cursor" />}
                 </div>
               ))}
             </div>
@@ -304,7 +291,7 @@ function DebugView({ onBack }: { onBack: () => void }) {
           <button key={op.id}
             className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 text-left cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-white/20"
             onClick={() => setSelected(op)}>
-            <img src={cdn+op.avatar.replace('#','%23')+'.png'} alt="" className="w-10 h-10 rounded-full object-cover"
+            <img src={cdn+op.avatar.replace('#','%23')+'.png'} alt={op.name} className="w-10 h-10 rounded-full object-cover"
               onError={e=>(e.target as HTMLElement).style.display='none'} />
             <div className="min-w-0">
               <div className="font-serif-cn text-sm text-warm-white truncate">{op.name}</div>
@@ -326,7 +313,7 @@ function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
   const portraitUrl = op.portrait
     ? (op.portrait.startsWith('skin/') ? p(op.portrait.replace('#','%23')) : p('portrait/' + op.portrait))
     : heroFallback
-      ? p('portrait/' + op.avatar + '_1.png')
+      ? p('avatar/' + op.avatar.replace('#', '%23') + '.png')
       : p('skin/' + op.avatar.replace('#','%23') + '_2b.png');
 
   const detailMsgs = [
@@ -347,7 +334,7 @@ function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
       <div className="relative w-full overflow-hidden" style={{ minHeight: '60vh' }}>
         <div className="absolute inset-0 z-0 flex items-start justify-center">
           {!imgLoaded && <div className="absolute inset-0 skeleton" />}
-          <img src={portraitUrl} alt=""
+          <img src={portraitUrl} alt={op.name}
             className="w-full h-full object-cover opacity-70"
             style={{ filter: 'brightness(0.55) saturate(1.1)', objectPosition: 'center 25%' }}
             onLoad={() => setImgLoaded(true)}
@@ -362,12 +349,13 @@ function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
         <div className="relative z-10 flex flex-col items-center justify-end min-h-[60vh] px-6 pb-8 text-center">
           <motion.div initial={{y:20,opacity:0}} animate={{y:0,opacity:1}} transition={{delay:0.1}}
             className="flex flex-col items-center">
-            <img src={avatarUrl} alt=""
+            <img src={avatarUrl} alt={op.name}
               className="w-20 h-20 rounded-full object-cover border-2 mb-4"
               style={{ borderColor: op.color + '60' }}
               onError={e => (e.target as HTMLImageElement).style.display = 'none'} />
             <h2 className="font-serif-en text-5xl font-normal tracking-[0.08em] text-white mb-1">{op.name}</h2>
             <p className="font-serif-cn text-sm tracking-[0.08em] text-warm-muted mb-3">{op.title}</p>
+            <p className="font-serif-cn text-xs leading-relaxed text-warm-muted/70 max-w-xs mb-4">{op.desc}</p>
             <div className="font-serif-en text-xs tracking-widest px-3 py-1 mb-2"
               style={{ color: op.color, border: `1px solid ${op.color}40` }}>
               {op.clazz}
