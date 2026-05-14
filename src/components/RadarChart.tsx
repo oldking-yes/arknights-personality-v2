@@ -54,13 +54,16 @@ export default function RadarChart({ user, operator, color, opName }: RadarChart
             backgroundColor: color + '14',
             borderWidth: 1,
             borderDash: [3, 3],
-            pointRadius: 0,
+            pointRadius: 2,
+            pointBackgroundColor: color,
+            pointBorderColor: '#0D0F11',
+            pointBorderWidth: 1,
           },
         ],
       },
       options: {
         responsive: true,
-        maintainAspectRatio: true,
+        maintainAspectRatio: false,
         plugins: {
           legend: {
             position: 'bottom',
@@ -69,7 +72,7 @@ export default function RadarChart({ user, operator, color, opName }: RadarChart
               font: { family: "'Cormorant Garamond', serif", size: 12 },
               boxWidth: 12,
               boxHeight: 4,
-              padding: 12,
+              padding: 16,
               usePointStyle: true,
             },
           },
@@ -79,7 +82,7 @@ export default function RadarChart({ user, operator, color, opName }: RadarChart
             bodyColor: '#B8B0A0',
             borderColor: 'rgba(232,227,216,0.1)',
             borderWidth: 1,
-            padding: 8,
+            padding: 10,
             cornerRadius: 0,
             titleFont: { family: "'Cormorant Garamond', serif", size: 12 },
             bodyFont: { family: "'Noto Sans SC', sans-serif", size: 11 },
@@ -89,7 +92,10 @@ export default function RadarChart({ user, operator, color, opName }: RadarChart
           r: {
             min: 0,
             max: 10,
-            ticks: { stepSize: 2, display: false },
+            ticks: {
+              stepSize: 2,
+              display: false,
+            },
             grid: {
               color: 'rgba(232,227,216,0.08)',
               lineWidth: 1,
@@ -101,7 +107,7 @@ export default function RadarChart({ user, operator, color, opName }: RadarChart
             pointLabels: {
               color: '#8A8270',
               font: { family: "'Noto Sans SC', sans-serif", size: 11 },
-              padding: 16,
+              padding: 20,
             },
           },
         },
@@ -118,9 +124,9 @@ export default function RadarChart({ user, operator, color, opName }: RadarChart
   }, [user, operator, color, opName]);
 
   return (
-    <div className="border border-white/5 p-4">
-      <div className="section-label mb-2">人格图谱</div>
-      <div className="w-full" style={{ height: 280 }}>
+    <div className="border border-white/5">
+      <div className="section-label mb-3 px-4 pt-4">人格图谱</div>
+      <div className="w-full aspect-square" style={{ maxHeight: 360 }}>
         <canvas ref={canvasRef} />
       </div>
     </div>
