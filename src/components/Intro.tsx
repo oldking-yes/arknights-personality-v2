@@ -3,9 +3,10 @@ import { motion } from 'framer-motion';
 interface IntroProps {
   onStart: () => void;
   onRandom: () => void;
+  onShowAll: () => void;
 }
 
-export default function Intro({ onStart, onRandom }: IntroProps) {
+export default function Intro({ onStart, onRandom, onShowAll }: IntroProps) {
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -73,13 +74,19 @@ export default function Intro({ onStart, onRandom }: IntroProps) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9, duration: 0.6 }}
-          className="mt-16"
+          className="mt-16 flex flex-col items-center gap-3"
         >
           <button
             onClick={onRandom}
             className="font-serif-cn text-xs tracking-[0.16em] text-warm-dim border-b border-transparent border-dotted cursor-pointer transition-all duration-200 hover:text-warm-muted hover:border-warm-dim bg-transparent pb-0.5"
           >
             ⚡ 直接看结果
+          </button>
+          <button
+            onClick={onShowAll}
+            className="font-mono text-[0.55rem] tracking-widest text-warm-dim/40 cursor-pointer transition-all duration-200 hover:text-warm-dim/70 bg-transparent border border-white/5 px-3 py-1"
+          >
+            DEBUG · 全部干员
           </button>
         </motion.div>
       </div>

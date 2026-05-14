@@ -1,17 +1,20 @@
 import { useState, useCallback, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import Intro from './components/Intro';
 import Quiz from './components/Quiz';
 import Results from './components/Results';
 import { QUESTIONS } from './data/questions';
 import { findBestMatch } from './utils/matching';
 import { saveProgress, loadProgress, clearProgress } from './utils/storage';
-import type { Stage, AnswerRecord } from './data/types';
+import type { Stage, AnswerRecord, Operator } from './data/types';
+import { OPERATORS } from './data/operators';
 
 const TOTAL = QUESTIONS.length;
 
+type AppStage = Stage | 'debug';
+
 export default function App() {
-  const [stage, setStage] = useState<Stage>('intro');
+  const [stage, setStage] = useState<AppStage>('intro');
   const [currentQ, setCurrentQ] = useState(0);
   const [scores, setScores] = useState<number[]>([0, 0, 0, 0, 0]);
   const [history, setHistory] = useState<AnswerRecord[]>([]);
@@ -34,6 +37,10 @@ export default function App() {
 
   const startQuiz = useCallback(() => {
     setCurrentQ(0); setScores([0,0,0,0,0]); setHistory([]); setResult(null); setStage('quiz');
+  }, []);
+
+  const showAll = useCallback(() => {
+    setStage('debug');
   }, []);
 
   const randomQuiz = useCallback(() => {
@@ -123,9 +130,10 @@ export default function App() {
 
       <div className="relative z-10 w-full max-w-lg mx-auto">
         <AnimatePresence mode="wait">
-          {stage==='intro' && <Intro key="intro" onStart={startQuiz} onRandom={randomQuiz} />}
+          {stage==='intro' && <Intro key="intro" onStart={startQuiz} onRandom={randomQuiz} onShowAll={showAll} />}
           {stage==='quiz' && currentQ < TOTAL && <Quiz key="quiz" currentQ={currentQ} onAnswer={handleAnswer} onPrev={handlePrev} />}
           {stage==='results' && result && <Results key="results" result={result} onRestart={restart} />}
+          {stage==='debug' && <DebugView key="debug" onBack={restart} />}
         </AnimatePresence>
       </div>
 
@@ -140,5 +148,37 @@ export default function App() {
         </span>
       </div>
     </div>
+  );
+}
+
+function DebugView({ onBack }: { onBack: () => void }) {
+  const [selected, setSelected] = useState<Operator | null>(null);
+  const cdn = 'https://raw.githubusercontent.com/Aceship/Arknight-Images/main/avatars/';
+
+  if (selected) return null;
+
+  return (
+    <motion.div initial={{opacity:0}} animate={{opacity:1}} className="min-h-screen px-4 py-12">
+      <button onClick={onBack}
+        className="mb-6 font-serif-cn text-xs tracking-[0.2em] text-warm-dim cursor-pointer hover:text-warm-muted bg-transparent border border-white/10 px-4 py-2">
+        ← 返回
+      </button>
+      <h2 className="font-serif-en text-2xl text-white tracking-[0.08em] mb-2">全部干员</h2>
+      <p className="font-serif-cn text-xs text-warm-dim mb-6">点击查看结果页</p>
+      <div className="grid grid-cols-2 gap-3">
+        {OPERATORS.map(op => (
+          <button key={op.id}
+            className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 text-left cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-white/20"
+            onClick={() => window.location.href = `/?debug=${op.id}`}>
+            <img src={cdn+op.avatar+'.png'} alt="" className="w-10 h-10 rounded-full object-cover"
+              onError={e=>(e.target as HTMLElement).style.display='none'} />
+            <div className="min-w-0">
+              <div className="font-serif-cn text-sm text-warm-white truncate">{op.name}</div>
+              <div className="font-serif-en text-[0.6rem] text-warm-dim truncate">{op.title}</div>
+            </div>
+          </button>
+        ))}
+      </div>
+    </motion.div>
   );
 }
