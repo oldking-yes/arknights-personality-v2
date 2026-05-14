@@ -61,7 +61,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['沉默的利刃','行动派','不回头','企鹅物流'] },
   { id:'lappland', name:'荒芜拉普兰德', title:'萨卢佐家族前任', clazz:'近卫', stars:6,
-    coords:[4,1,9,3,5], color:'#ff60a0', tag:'ENTP', avatar:'char_2013_cerber',
+    coords:[4,1,9,3,5], color:'#ff60a0', tag:'ENTP', avatar:'char_1038_whitw2',
     desc:'叙拉古萨卢佐家族前任继承人。如今只遵循自己的规则。',
     epigraph:'"秩序是弱者的借口。<br>真正的自由，是拥抱混沌。"',
     persona:[
@@ -76,7 +76,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['混沌之子','笑对一切','自由的疯子','白狼'] },
   { id:'exusiai', name:'新约能天使', title:'企鹅物流信使·圣徒', clazz:'狙击', stars:6,
-    coords:[3,7,8,2,9], color:'#ff2222', tag:'ENFP', avatar:'char_279_excu',
+    coords:[3,7,8,2,9], color:'#ff2222', tag:'ENFP', avatar:'char_1041_angel2',
     desc:'企鹅物流最开朗的信使。铳声和笑声一起响起。',
     epigraph:'"快乐不是一种状态，是一种选择。而我选择快乐。"',
     persona:[
@@ -121,7 +121,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['不破之盾','沉默的守护者','责任即信仰','坚实的背影'] },
   { id:'blaze', name:'烛煌', title:'罗德岛精英干员', clazz:'近卫', stars:6,
-    coords:[4,6,9,3,8], color:'#ff5500', tag:'ESFP', avatar:'char_017_huang',
+    coords:[4,6,9,3,8], color:'#ff5500', tag:'ESFP', avatar:'char_1040_blaze2',
     desc:'罗德岛精英干员。火神血脉。燃烧是她的本能。',
     epigraph:'"燃烧不是毁灭。燃烧是证明我活着的方式。"',
     persona:[
@@ -196,7 +196,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['温柔的引力','治愈','善良的勇气','信使'] },
   { id:'hoshiguma', name:'斩业星熊', title:'龙门近卫局干员', clazz:'重装', stars:5,
-    coords:[6,6,5,8,7], color:'#44dd44', tag:'ISFJ', avatar:'char_136_hsguma',
+    coords:[6,6,5,8,7], color:'#44dd44', tag:'ISFJ', avatar:'char_1044_hsgma2',
     desc:'龙门近卫局干员。陈的搭档。般若的持有者。',
     epigraph:'"真正的勇气不是无所畏惧。是带着恐惧，仍然站在那里。"',
     persona:[
@@ -226,7 +226,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['烈焰','渴望理解','自由','赫默的拥抱'] },
   { id:'w', name:'维什戴尔', title:'罗德岛精英干员', clazz:'狙击', stars:6,
-    coords:[7,3,8,3,7], color:'#dd2222', tag:'ENTP', avatar:'char_140_whitew',
+    coords:[7,3,8,3,7], color:'#dd2222', tag:'ENTP', avatar:'char_1035_wisdel',
     desc:'前整合运动干部、萨卡兹佣兵。特蕾西娅赐予的名字，意为"渴望归处"。',
     epigraph:'"Wiš\'adel——我是签在这里吗？<br>殿下说这个名字的意思是\'渴望归处\'，但我从不许愿。"',
     persona:[

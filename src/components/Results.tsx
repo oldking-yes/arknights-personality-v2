@@ -9,7 +9,7 @@ interface ResultsProps {
   onRestart: () => void;
 }
 
-const charCdn = 'https://raw.githubusercontent.com/Aceship/Arknight-Images/main/characters/';
+const charCdn = 'https://raw.githubusercontent.com/yuanyan3060/Arknights-Bot-Resource/main/portrait/';
 
 export default function Results({ result, onRestart }: ResultsProps) {
   const { op, compatible, userCoords } = result;
