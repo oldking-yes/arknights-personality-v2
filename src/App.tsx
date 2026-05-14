@@ -221,9 +221,12 @@ function DebugView({ onBack }: { onBack: () => void }) {
 function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
   const baseCdn = 'https://raw.githubusercontent.com/yuanyan3060/Arknights-Bot-Resource/main/';
   const avatarUrl = baseCdn + 'avatar/' + op.avatar.replace('#','%23') + '.png';
+  const [heroFallback, setHeroFallback] = useState(false);
   const portraitUrl = op.portrait
     ? (op.portrait.startsWith('skin/') ? baseCdn + op.portrait : baseCdn + 'portrait/' + op.portrait)
-    : baseCdn + 'portrait/' + op.avatar + '_1.png';
+    : heroFallback
+      ? baseCdn + 'portrait/' + op.avatar + '_1.png'
+      : baseCdn + 'skin/' + op.avatar.replace('#','%23') + '_2b.png';
 
   const detailMsgs = [
     '作战记录 #' + Math.floor(Math.random() * 9000 + 1000),
@@ -241,9 +244,12 @@ function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
       <div className="relative w-full overflow-hidden" style={{ minHeight: '60vh' }}>
         <div className="absolute inset-0 z-0 flex items-start justify-center">
           <img src={portraitUrl} alt=""
-            className="w-full h-full object-contain opacity-40"
-            style={{ filter: 'brightness(0.6) saturate(1)', objectPosition: 'center 20%' }}
-            onError={e => (e.target as HTMLImageElement).style.display = 'none'} />
+            className="w-full h-full object-cover opacity-70"
+            style={{ filter: 'brightness(0.55) saturate(1.1)', objectPosition: 'center 25%' }}
+            onError={e => {
+              if (!op.portrait && !heroFallback) setHeroFallback(true);
+              else (e.target as HTMLImageElement).style.display = 'none';
+            }} />
           <div className="absolute inset-0" style={{
             background: 'linear-gradient(to bottom, rgba(13,15,17,0.3) 0%, rgba(13,15,17,0.6) 50%, #0D0F11 100%)'
           }} />

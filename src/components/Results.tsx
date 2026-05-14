@@ -14,9 +14,12 @@ const charCdn = baseCdn + 'portrait/';
 
 export default function Results({ result, onRestart }: ResultsProps) {
   const { op, compatible, userCoords } = result;
+  const [heroFallback, setHeroFallback] = useState(false);
   const charUrl = op.portrait
     ? (op.portrait.startsWith('skin/') ? baseCdn + op.portrait : charCdn + op.portrait)
-    : charCdn + op.avatar + '_1.png';
+    : heroFallback
+      ? charCdn + op.avatar + '_1.png'
+      : baseCdn + 'skin/' + op.avatar.replace('#','%23') + '_2b.png';
   const [showShare, setShowShare] = useState(false);
   const [shareImg, setShareImg] = useState('');
 
@@ -130,9 +133,12 @@ export default function Results({ result, onRestart }: ResultsProps) {
             <img
               src={charUrl}
               alt=""
-              className="w-full h-full object-contain opacity-60"
-              style={{ filter: 'brightness(0.65) saturate(1)', objectPosition: 'center 20%' }}
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+              className="w-full h-full object-cover opacity-70"
+              style={{ filter: 'brightness(0.55) saturate(1.1)', objectPosition: 'center 25%' }}
+              onError={(e) => {
+                if (!op.portrait && !heroFallback) setHeroFallback(true);
+                else (e.target as HTMLImageElement).style.display = 'none';
+              }}
             />
             <div className="absolute inset-0" style={{
               background: 'linear-gradient(to bottom, rgba(13,15,17,0.1) 0%, rgba(13,15,17,0.5) 50%, #0D0F11 100%)'

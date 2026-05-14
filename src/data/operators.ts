@@ -181,7 +181,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['莱瓦汀','失忆的旅人','冷漠外壳','孤独的燃烧'] },
   { id:'angelina', name:'安洁莉娜', title:'信使·高中女生', clazz:'辅助', stars:5,
-    coords:[3,9,6,5,8], color:'#ff88cc', tag:'ENFJ', avatar:'char_103_angel',
+    coords:[3,9,6,5,8], color:'#ff88cc', tag:'ENFJ', avatar:'char_291_aglina',
     desc:'普通高中女生，兼职企鹅物流信使。让她身边的人感到安心。',
     epigraph:'"每个人都需要被温柔对待。哪怕只是有人愿意听你说说话。"',
     persona:[
