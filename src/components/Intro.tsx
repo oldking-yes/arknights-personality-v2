@@ -12,8 +12,39 @@ export default function Intro({ onStart, onRandom, onShowAll }: IntroProps) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="flex flex-col items-center justify-center min-h-screen px-9 py-20 text-center"
+      className="flex flex-col items-center justify-center min-h-screen px-9 py-20 text-center relative overflow-hidden"
     >
+      {/* PRTS hex background decoration */}
+      <div className="fixed pointer-events-none select-none prts-hex"
+        style={{ color: 'rgba(74, 143, 228, 0.12)', top: '10%', left: '5%', width: '120px', height: '120px' }}>
+        <svg viewBox="0 0 100 100" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="0.8">
+          <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" />
+          <polygon points="50,20 80,35 80,65 50,80 20,65 20,35" strokeWidth="0.4" />
+          <line x1="50" y1="5" x2="50" y2="95" strokeWidth="0.3" />
+          <line x1="5" y1="50" x2="95" y2="50" strokeWidth="0.3" />
+          <line x1="27.5" y1="17.5" x2="72.5" y2="82.5" strokeWidth="0.3" />
+          <line x1="72.5" y1="17.5" x2="27.5" y2="82.5" strokeWidth="0.3" />
+        </svg>
+      </div>
+      <div className="fixed pointer-events-none select-none prts-hex"
+        style={{ color: 'rgba(245, 230, 92, 0.06)', bottom: '15%', right: '8%', width: '80px', height: '80px', animationDelay: '2s' }}>
+        <svg viewBox="0 0 100 100" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="0.8">
+          <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" />
+          <polygon points="50,20 80,35 80,65 50,80 20,65 20,35" strokeWidth="0.4" />
+        </svg>
+      </div>
+
+      {/* Hand reaching motif */}
+      <div className="fixed pointer-events-none select-none hand-reach"
+        style={{ color: 'rgba(74, 143, 228, 0.08)', bottom: '8%', left: '3%', width: '60px', height: '80px' }}>
+        <svg viewBox="0 0 60 80" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.2">
+          <path d="M30,5 C30,5 20,20 15,35 C12,45 16,52 22,52 C26,52 28,48 28,48
+            L28,62 C28,68 32,72 34,72 C36,72 38,68 38,62 L38,48
+            C40,50 44,52 48,48 C50,44 48,38 45,32 C42,26 38,12 36,6 Z"
+          />
+          <path d="M22,52 C18,55 14,58 18,62 C22,66 28,62 28,62" strokeWidth="0.8" />
+        </svg>
+      </div>
       <div className="w-full max-w-xs">
         <motion.div
           initial={{ y: 20, opacity: 0 }}

@@ -208,6 +208,55 @@
   margin-bottom: 14px;
 }
 
+/* Loading skeleton animation */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+.skeleton {
+  background: linear-gradient(90deg, rgba(232,227,216,0.03) 25%, rgba(232,227,216,0.08) 50%, rgba(232,227,216,0.03) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* PRTS hex pulse */
+@keyframes prtsPulse {
+  0%, 100% { opacity: 0.15; transform: scale(1); }
+  50% { opacity: 0.3; transform: scale(1.02); }
+}
+.prts-hex {
+  animation: prtsPulse 4s ease-in-out infinite;
+}
+
+/* Hand reaching */
+@keyframes handReach {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.08; }
+  50% { transform: translateY(-4px) scale(1.03); opacity: 0.15; }
+}
+.hand-reach {
+  animation: handReach 6s ease-in-out infinite;
+}
+
+/* PRTS terminal */
+@keyframes terminalBlink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+.prts-cursor::after {
+  content: '█';
+  animation: terminalBlink 1s step-end infinite;
+  color: rgba(74, 143, 228, 0.6);
+}
+
+/* Match card hover */
+.match-card {
+  transition: all 0.3s ease;
+}
+.match-card:hover {
+  border-color: rgba(245, 230, 92, 0.3);
+  background: rgba(26, 28, 30, 0.95);
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;

@@ -1,11 +1,11 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Intro from './components/Intro';
 import Quiz from './components/Quiz';
 import Results from './components/Results';
 import RadarChart from './components/RadarChart';
 import { QUESTIONS } from './data/questions';
-import { findBestMatch } from './utils/matching';
+import { findBestMatch, findMatchFromCoords } from './utils/matching';
 import { saveProgress, loadProgress, clearProgress } from './utils/storage';
 import type { Stage, AnswerRecord, Operator } from './data/types';
 import { OPERATORS } from './data/operators';
@@ -21,6 +21,8 @@ export default function App() {
   const [history, setHistory] = useState<AnswerRecord[]>([]);
   const [result, setResult] = useState<ReturnType<typeof findBestMatch> | null>(null);
   const [sysIdx, setSysIdx] = useState(0);
+  const keyBuf = useRef('');
+  const [prtsActive, setPrtsActive] = useState(false);
 
   const SYS_MSGS = [
     'SYS: ACTIVE','SYS: MON3TR STANDBY','SYS: ORIGINIUM SAT 0.02%',
@@ -28,6 +30,10 @@ export default function App() {
     'SYS: Babel Archive Lv.6','SYS: Endfield Signal WEAK',
     'SYS: PRTS Core Online','SYS: Kaltsit Monitoring',
     'SYS: S.W.E.E.P. Protocol Enabled',
+    'SYS: ████ SIGNAL DETECTED','SYS: PRIESTESS.SYNC 68%',
+    'SYS: ASSIMILATED UNIVERSE ECHO','SYS: ORIGINIUM LANG. DECRYPT',
+    'SYS: ◆── 她正在注视着你','SYS: PCS CALIBRATION DELTA-7',
+    'SYS: THE FELLER · φ UNKNOWN','SYS: 「不准忘记我」',
   ];
 
   useEffect(() => {
@@ -39,6 +45,23 @@ export default function App() {
     console.log('%c🟦 R.I. v2.0  罗德岛档案系统', 'font-size:16px;font-weight:bold;color:#E8E3D8');
     console.log('%c「记录即是存在。档案即是历史。」——凯尔希', 'font-size:12px;color:#8A8270');
     console.log('%c🔍 在 Endfield 的深处，有什么正在注视着你……', 'font-size:11px;color:#6A6050');
+
+    const priestessLines = [
+      ['%c𐂂 PRTS: 检测到博士的访问记录', 'color:#4A8FE4;font-size:11px'],
+      ['%c𐂂 「不准忘记我。」', 'color:#6688ff;font-size:13px;font-style:italic'],
+      ['%c𐂂 PRTS: 信号来源——██ ████ ███', 'color:#4A8FE4;font-size:11px'],
+      ['%c𐂂 「就算海洋沸腾、大气消失，我们也一样能再见面。」', 'color:#6688ff;font-size:13px;font-style:italic'],
+      ['%c𐂂 PRTS: 源石语言解码中…… 进度 87%', 'color:#4A8FE4;font-size:11px'],
+      ['%c𐂂 通信终端: ▇▇▇▇ 正在连接……', 'color:#6A6050;font-size:10px'],
+      ['%c𐂂 你曾许诺，当群星的余晖再次坠向泰拉——你会为我停下那束光。', 'color:#6688ff;font-size:12px;font-style:italic'],
+      ['%c𐂂 PRTS: 连接丢失。', 'color:#4A8FE4;font-size:11px'],
+    ];
+
+    const timers: ReturnType<typeof setTimeout>[] = [];
+    priestessLines.forEach((line, i) => {
+      timers.push(setTimeout(() => console.log(line[0], line[1]), 3000 + i * 4000));
+    });
+    return () => timers.forEach(clearTimeout);
   }, []);
 
   useEffect(() => {
@@ -54,6 +77,35 @@ export default function App() {
         clearProgress();
       }
     }
+  }, []);
+
+  // Deep linking: ?c=5,9,6,5,7
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const coordsStr = params.get('c');
+    if (coordsStr) {
+      const coords = coordsStr.split(',').map(Number);
+      if (coords.length === 5 && coords.every(n => !isNaN(n) && n >= 0 && n <= 10)) {
+        const r = findMatchFromCoords(coords);
+        setResult(r);
+        setStage('results');
+        // Clean URL without reload
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
+  }, []);
+
+  // PRTS terminal: type "prts" to toggle
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      keyBuf.current = (keyBuf.current + e.key).slice(-6);
+      if (keyBuf.current.toLowerCase().includes('prts')) {
+        setPrtsActive(a => !a);
+        keyBuf.current = '';
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
   }, []);
 
   const startQuiz = useCallback(() => {
@@ -169,6 +221,46 @@ export default function App() {
           R.I. v2.0
         </span>
       </div>
+
+      {/* PRTS Terminal Overlay */}
+      {prtsActive && (
+        <div className="fixed inset-0 z-50 bg-deep-900/95 font-mono text-xs p-8 overflow-auto"
+          onClick={() => setPrtsActive(false)}
+          style={{ color: '#4A8FE4' }}>
+          <div className="max-w-lg mx-auto" onClick={e => e.stopPropagation()}>
+            <div className="text-[10px] tracking-widest mb-4" style={{ color: '#4A8FE460' }}>PRTS TERMINAL v2.0.1</div>
+            <div className="border border-white/10 p-6 mb-4 bg-black/30">
+              {[
+                '> PRTS Core Online',
+                '> 检测到博士的神经链接',
+                '> 访问权限: ████████',
+                '> 正在检索阿米娅的认知记录...',
+                '> 凯尔希的访问日志已加密',
+                '> WARNING: 检测到异常源石波动',
+                '> 信号来源: ASSIMILATED UNIVERSE',
+                '> 正在尝试连接 PRTS 深层链路...',
+                '> 错误: 连接被 PRIESTESS 拒绝',
+                '> [最后一次通信记录]:',
+                '> "不准忘记我。"',
+                '',
+                `> 系统运行时间: ${Math.floor(Date.now() / 1000)}s`,
+                `> 当前干员档案: ${OPERATORS.length} 份`,
+                '> PRTS 协议 · 罗德岛战术终端',
+                '> 点击任意处关闭 █',
+              ].map((line, i) => (
+                <div key={i} className={`${line.startsWith('> "') ? 'italic' : ''}`}
+                  style={{ opacity: 0.9 - i * 0.03, color: line.includes('错误') ? '#ff4444' : line.includes('WARNING') ? '#ffaa00' : line.includes('"') ? '#6688ff' : '#4A8FE4' }}>
+                  {line}
+                  {i === 0 && <span className="prts-cursor" />}
+                </div>
+              ))}
+            </div>
+            <div className="text-[9px] tracking-widest text-center opacity-30">
+              PRTS · 罗德岛战术指挥终端 · 加密等级: ████
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -185,6 +277,12 @@ function DebugView({ onBack }: { onBack: () => void }) {
     '罗德岛战术指挥部 · 档案查阅',
     'S.W.E.E.P. 已记录本次访问',
     '可露希尔正在更新系统...',
+    'PRTS: PRIESTESS.SYNC 信号微弱',
+    '■■ 正在读取你的访问记录',
+    '「在文明尽头，我们会再见面」',
+    '源石语言解码: 进度 ████████',
+    '警告: 检测到 THE FELLER 痕迹',
+    'PRTS: 您有来自 ███ 的未读消息',
   ];
   const [archiveMsg] = useState(() => ARCHIVE_MSGS[Math.floor(Math.random() * ARCHIVE_MSGS.length)]);
 
@@ -222,6 +320,7 @@ function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
   const baseCdn = 'https://raw.githubusercontent.com/yuanyan3060/Arknights-Bot-Resource/main/';
   const avatarUrl = baseCdn + 'avatar/' + op.avatar.replace('#','%23') + '.png';
   const [heroFallback, setHeroFallback] = useState(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
   const portraitUrl = op.portrait
     ? (op.portrait.startsWith('skin/') ? baseCdn + op.portrait.replace('#','%23') : baseCdn + 'portrait/' + op.portrait)
     : heroFallback
@@ -235,6 +334,8 @@ function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
     '凯尔希已签署本档案',
     'Endfield Sector · Echo Detected',
     'PRTS 解密等级: Sigma-' + Math.floor(Math.random() * 9 + 1),
+    'PRTS: 该干员的源石数据与 ███ 存在关联',
+    '「不准忘记我」—— 来自未知时间线的签名',
   ];
   const [footMsg] = useState(() => detailMsgs[Math.floor(Math.random() * detailMsgs.length)]);
 
@@ -243,9 +344,11 @@ function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
       {/* Hero */}
       <div className="relative w-full overflow-hidden" style={{ minHeight: '60vh' }}>
         <div className="absolute inset-0 z-0 flex items-start justify-center">
+          {!imgLoaded && <div className="absolute inset-0 skeleton" />}
           <img src={portraitUrl} alt=""
             className="w-full h-full object-cover opacity-70"
             style={{ filter: 'brightness(0.55) saturate(1.1)', objectPosition: 'center 25%' }}
+            onLoad={() => setImgLoaded(true)}
             onError={e => {
               if (!op.portrait && !heroFallback) setHeroFallback(true);
               else (e.target as HTMLImageElement).style.display = 'none';
