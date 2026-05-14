@@ -226,7 +226,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['烈焰','渴望理解','自由','赫默的拥抱'] },
   { id:'w', name:'维什戴尔', title:'罗德岛精英干员', clazz:'狙击', stars:6,
-    coords:[7,3,8,3,7], color:'#dd2222', tag:'ENTP', avatar:'char_1035_wisdel',
+    coords:[7,3,8,3,7], color:'#dd2222', tag:'ENTP', avatar:'char_140_whitew',
     desc:'前整合运动干部、萨卡兹佣兵。特蕾西娅赐予的名字，意为"渴望归处"。',
     epigraph:'"Wiš\'adel——我是签在这里吗？<br>殿下说这个名字的意思是\'渴望归处\'，但我从不许愿。"',
     persona:[
