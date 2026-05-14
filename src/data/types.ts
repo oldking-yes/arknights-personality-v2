@@ -19,6 +19,7 @@ export interface Operator {
   color: string;
   tag: string;
   avatar: string;
+  portrait?: string;
   desc: string;
   epigraph: string;
   persona: string[];

@@ -9,11 +9,14 @@ interface ResultsProps {
   onRestart: () => void;
 }
 
-const charCdn = 'https://raw.githubusercontent.com/yuanyan3060/Arknights-Bot-Resource/main/portrait/';
+const baseCdn = 'https://raw.githubusercontent.com/yuanyan3060/Arknights-Bot-Resource/main/';
+const charCdn = baseCdn + 'portrait/';
 
 export default function Results({ result, onRestart }: ResultsProps) {
   const { op, compatible, userCoords } = result;
-  const charUrl = charCdn + op.avatar + '_1.png';
+  const charUrl = op.portrait
+    ? (op.portrait.startsWith('skin/') ? baseCdn + op.portrait : charCdn + op.portrait)
+    : charCdn + op.avatar + '_1.png';
   const [showShare, setShowShare] = useState(false);
   const [shareImg, setShareImg] = useState('');
 

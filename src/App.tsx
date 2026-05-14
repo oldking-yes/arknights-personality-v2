@@ -170,7 +170,7 @@ function DebugView({ onBack }: { onBack: () => void }) {
           <button key={op.id}
             className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 text-left cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-white/20"
             onClick={() => window.location.href = `/?debug=${op.id}`}>
-            <img src={cdn+op.avatar+'.png'} alt="" className="w-10 h-10 rounded-full object-cover"
+            <img src={cdn+op.avatar.replace('#','%23')+'.png'} alt="" className="w-10 h-10 rounded-full object-cover"
               onError={e=>(e.target as HTMLElement).style.display='none'} />
             <div className="min-w-0">
               <div className="font-serif-cn text-sm text-warm-white truncate">{op.name}</div>
