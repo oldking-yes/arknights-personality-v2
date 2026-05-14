@@ -136,7 +136,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['不灭的火焰','热血沸腾','勇往直前','电锯轰鸣'] },
   { id:'kaltsit', name:'凯尔希·思衡托', title:'罗德岛医疗主管', clazz:'医疗', stars:6,
-    coords:[9,3,5,8,3], color:'#44cc88', tag:'', avatar:'char_003_kalts_2', portrait:'char_003_kalts_2.png',
+    coords:[9,3,5,8,3], color:'#44cc88', tag:'', avatar:'char_1052_kalts2', portrait:'skin/char_1052_kalts2_2b.png',
     desc:'罗德岛医疗部负责人。Mon3tr 是她最温和的一面。',
     epigraph:'"真理不需要被任何人喜欢。它只需要被知道。"',
     persona:[
