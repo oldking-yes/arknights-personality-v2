@@ -77,7 +77,7 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#07090e] relative overflow-hidden">
+    <div className="min-h-screen bg-deep-900 relative overflow-hidden">
       {/* Grid background */}
       <div className="fixed inset-0 pointer-events-none z-0"
         style={{
@@ -89,17 +89,21 @@ export default function App() {
         style={{ background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px)' }}
       />
 
-      {/* Particles */}
+      {/* Floating particles - lemon yellow + tech blue + orange */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {Array.from({length:20}).map((_,i) => (
-          <div key={i} className="absolute w-[2px] h-[2px] bg-lemon/20 rounded-full"
-            style={{
-              left:`${Math.random()*100}%`, top:`${Math.random()*100}%`,
-              animation:`pulse ${2+Math.random()*3}s ease-in-out infinite`,
-              animationDelay:`${Math.random()*3}s`
-            }}
-          />
-        ))}
+        {Array.from({length:24}).map((_,i) => {
+          const colors = ['rgba(245,230,92,0.2)', 'rgba(74,143,228,0.15)', 'rgba(232,114,74,0.12)'];
+          return (
+            <div key={i} className="absolute w-[2px] h-[2px] rounded-full"
+              style={{
+                left:`${Math.random()*100}%`, top:`${Math.random()*100}%`,
+                backgroundColor: colors[i % 3],
+                animation:`pulse ${2+Math.random()*3}s ease-in-out infinite`,
+                animationDelay:`${Math.random()*3}s`
+              }}
+            />
+          );
+        })}
       </div>
 
       <style>{`@keyframes pulse{0%,100%{opacity:0}50%{opacity:1}}`}</style>
@@ -107,7 +111,7 @@ export default function App() {
       <div className="relative z-10 w-full max-w-lg mx-auto px-3">
         <AnimatePresence mode="wait">
           {stage==='intro' && <Intro key="intro" onStart={startQuiz} onRandom={randomQuiz} />}
-          {stage==='quiz' && <Quiz key="quiz" currentQ={currentQ} onAnswer={handleAnswer} onPrev={handlePrev} />}
+          {stage==='quiz' && currentQ < TOTAL && <Quiz key="quiz" currentQ={currentQ} onAnswer={handleAnswer} onPrev={handlePrev} />}
           {stage==='results' && result && <Results key="results" result={result} onRestart={restart} />}
         </AnimatePresence>
       </div>

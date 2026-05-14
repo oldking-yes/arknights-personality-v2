@@ -7,10 +7,11 @@ import {
   Filler,
   Tooltip,
   Legend,
+  RadarController,
 } from 'chart.js';
 import { DIM_LABELS } from '../data/types';
 
-ChartJS.register(RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
+ChartJS.register(RadarController, RadialLinearScale, PointElement, LineElement, Filler, Tooltip, Legend);
 
 interface RadarChartProps {
   user: number[];
@@ -43,7 +44,7 @@ export default function RadarChart({ user, operator, color, opName }: RadarChart
             borderWidth: 2.5,
             pointRadius: 3,
             pointBackgroundColor: color,
-            pointBorderColor: '#07090e',
+            pointBorderColor: '#0D0F11',
             pointBorderWidth: 1.5,
           },
           {
@@ -64,18 +65,18 @@ export default function RadarChart({ user, operator, color, opName }: RadarChart
           legend: {
             position: 'bottom',
             labels: {
-              color: '#607080',
-              font: { family: "'Share Tech Mono', monospace", size: 11 },
+              color: '#606A78',
+              font: { family: "'Space Grotesk', monospace", size: 11 },
               boxWidth: 12,
               boxHeight: 4,
               padding: 12,
             },
           },
           tooltip: {
-            backgroundColor: 'rgba(15,21,32,0.9)',
-            titleColor: '#c8d0dc',
-            bodyColor: '#8a9bb5',
-            borderColor: 'rgba(30,45,64,0.5)',
+            backgroundColor: 'rgba(13,15,17,0.95)',
+            titleColor: '#D0D5DD',
+            bodyColor: '#8A94A2',
+            borderColor: 'rgba(245,230,92,0.15)',
             borderWidth: 1,
             padding: 8,
             cornerRadius: 0,
@@ -92,15 +93,15 @@ export default function RadarChart({ user, operator, color, opName }: RadarChart
               display: false,
             },
             grid: {
-              color: 'rgba(30,45,64,0.6)',
+              color: 'rgba(45,50,56,0.8)',
               lineWidth: 1,
             },
             angleLines: {
-              color: 'rgba(30,45,64,0.4)',
+              color: 'rgba(45,50,56,0.5)',
               lineWidth: 1,
             },
             pointLabels: {
-              color: '#607080',
+              color: '#606A78',
               font: { family: "'Noto Sans SC', sans-serif", size: 11 },
               padding: 16,
             },
@@ -119,7 +120,7 @@ export default function RadarChart({ user, operator, color, opName }: RadarChart
   }, [user, operator, color, opName]);
 
   return (
-    <div className="bg-slate-800/60 border border-slate-700/30 p-3 sm:p-4">
+    <div className="bg-card-bg border border-lemon-dim p-3 sm:p-4">
       <p className="font-mono text-[0.6rem] tracking-[0.2em] text-slate-500 text-center mb-1 uppercase">
         人格图谱 · Personality Matrix
       </p>

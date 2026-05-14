@@ -59,7 +59,7 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
             exit={{ opacity: 0, x: -40 }}
             transition={{ duration: 0.3, ease: 'easeOut' }}
           >
-            <div className="bg-slate-800/80 backdrop-blur-sm border border-slate-700/50 p-5 sm:p-6 mb-3">
+            <div className="bg-card-bg backdrop-blur-sm border border-lemon-dim p-5 sm:p-6 mb-3">
               <p className="text-base sm:text-lg font-medium leading-relaxed text-slate-200 mb-5">
                 {question.text}
               </p>

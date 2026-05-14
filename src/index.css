@@ -1,36 +1,41 @@
 @import "tailwindcss";
 
 @theme {
-  --color-deep-900: #07090e;
-  --color-deep-800: #0a0e17;
-  --color-deep-700: #0f1520;
-  --color-card-bg: rgba(15, 21, 32, 0.7);
+  --color-deep-900: #0D0F11;
+  --color-deep-800: #1A1C1E;
+  --color-deep-700: #2D3238;
+  --color-deep-600: #3D434A;
+  --color-deep-500: #4D555E;
+  --color-card-bg: rgba(45, 50, 56, 0.8);
   --color-lemon: #F5E65C;
-  --color-lemon-dark: #D4C840;
-  --color-lemon-muted: #A89A20;
-  --color-slate-300: #c8d0dc;
-  --color-slate-400: #8a9bb5;
-  --color-slate-500: #607080;
-  --color-slate-600: #3a4555;
-  --color-slate-700: #1e2d40;
-  --color-slate-800: #141c2b;
-  --color-orange-400: #ff8c42;
-  --color-red-400: #ff4060;
+  --color-lemon-dim: rgba(245, 230, 92, 0.15);
+  --color-lemon-glow: rgba(245, 230, 92, 0.3);
+  --color-blue-accent: #4A8FE4;
+  --color-blue-dim: rgba(74, 143, 228, 0.15);
+  --color-orange-accent: #E8724A;
+  --color-orange-dim: rgba(232, 114, 74, 0.15);
+  --color-slate-200: #D0D5DD;
+  --color-slate-300: #B0B8C4;
+  --color-slate-400: #8A94A2;
+  --color-slate-500: #606A78;
+  --color-slate-600: #3D454F;
+  --color-slate-700: #2D3238;
+  --color-slate-800: #1A1C1E;
 }
 
 @layer base {
   body {
     font-family: 'Space Grotesk', 'Noto Sans SC', system-ui, sans-serif;
-    background: #07090e;
-    color: #c8d0dc;
+    background: #0D0F11;
+    color: #B0B8C4;
     margin: 0;
     min-height: 100dvh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
   }
   ::selection {
-    background: rgba(0, 212, 255, 0.2);
-    color: #e0e8f0;
+    background: rgba(245, 230, 92, 0.2);
+    color: #D0D5DD;
   }
 }
 

@@ -46,7 +46,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
           initial={{ scale: 0.92, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-          className="relative bg-slate-800/60 border border-slate-700/30 p-5 text-center mb-3 overflow-hidden"
+          className="relative bg-card-bg border border-lemon-dim p-5 text-center mb-3 overflow-hidden"
         >
           {/* Glow */}
           <div
@@ -93,7 +93,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2 }}
-          className="bg-slate-800/60 border border-slate-700/30 p-4 mb-3"
+          className="bg-card-bg border border-lemon-dim p-4 mb-3"
         >
           <p className="font-mono text-[0.6rem] tracking-[0.2em] text-slate-500 text-center mb-3 uppercase">
             维度对比 &#xB7; Dimension Comparison
@@ -142,7 +142,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-slate-800/60 border border-slate-700/30 p-4 mt-3"
+          className="bg-card-bg border border-lemon-dim p-4 mt-3"
         >
           <p className="text-xs text-slate-500 leading-relaxed">
             <strong className="text-slate-200">{op.name}</strong> — {op.desc}

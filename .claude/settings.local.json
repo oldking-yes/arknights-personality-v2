@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(gh api *)",
+      "Bash(python -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\(f'homepage: {d.get\\(\\\\\"homepage\\\\\",\\\\\"n/a\\\\\"\\)}'\\); print\\(f'has_pages: {d.get\\(\\\\\"has_pages\\\\\",\\\\\"n/a\\\\\"\\)}'\\); print\\(f'html_url: {d.get\\(\\\\\"html_url\\\\\",\\\\\"n/a\\\\\"\\)}'\\)\")",
+      "Bash(npx playwright *)",
+      "Bash(curl *)",
+      "Read(//d/桌面/Claude Code/**)",
+      "Read(//d/桌面/**)",
+      "Bash(node audit-test.mjs)",
+      "Bash(node -e ' *)",
+      "Bash(netstat -ano)",
+      "Bash(tasklist /fi \"PID eq 0\")",
+      "Bash(taskkill *)",
+      "Bash(/c/Windows/System32/taskkill.exe /PID 27532 /F)",
+      "Skill(update-config)",
+      "Bash(node debug.mjs)",
+      "WebFetch(domain:oldking-yes.github.io)",
+      "Bash(python3 -c \"import sys,json; data=json.load\\(sys.stdin\\); [print\\(f'{r[\\\\\"conclusion\\\\\"]} {r[\\\\\"head_commit\\\\\"][\\\\\"message\\\\\"][:50]}'\\) for r in data.get\\('workflow_runs',[]\\)]\")"
+    ]
+  }
+}
