@@ -60,10 +60,10 @@ function drawRadar(
   // Labels
   ctx.textAlign = 'center';
   ctx.fillStyle = '#8A8270';
-  ctx.font = '11px "Noto Sans SC", sans-serif';
+  ctx.font = '13px "Noto Sans SC", sans-serif';
   angles.forEach((a, i) => {
-    const x = cx + (radius + 24) * Math.cos(a);
-    const y = cy + (radius + 24) * Math.sin(a);
+    const x = cx + (radius + 28) * Math.cos(a);
+    const y = cy + (radius + 28) * Math.sin(a);
     ctx.fillText(labels[i], x, y + 4);
   });
 
@@ -134,7 +134,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
     if (shareLoading) return;
     setShareLoading(true);
 
-    const W = 800, H = 1200;
+    const W = 800, H = 1300;
     const canvas = document.createElement('canvas');
     canvas.width = W;
     canvas.height = H;
@@ -148,8 +148,8 @@ export default function Results({ result, onRestart }: ResultsProps) {
     // Hex pattern bg
     ctx.strokeStyle = 'rgba(232,227,216,0.03)';
     ctx.lineWidth = 0.5;
-    for (let r = 0; r < 24; r++) {
-      for (let c = 0; c < 18; c++) {
+    for (let r = 0; r < 26; r++) {
+      for (let c = 0; c < 20; c++) {
         const cx = c * 48 + (r % 2) * 24, cy = r * 40;
         ctx.beginPath();
         for (let i = 0; i < 6; i++) {
@@ -162,11 +162,11 @@ export default function Results({ result, onRestart }: ResultsProps) {
     }
 
     // Radial glow
-    const grad = ctx.createRadialGradient(400, 150, 20, 400, 150, 350);
-    grad.addColorStop(0, op.color + '25');
+    const grad = ctx.createRadialGradient(400, 160, 20, 400, 160, 380);
+    grad.addColorStop(0, op.color + '30');
     grad.addColorStop(1, 'transparent');
     ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, 400);
+    ctx.fillRect(0, 0, W, 450);
 
     // Try loading avatar for card
     const avatarImg = await new Promise<HTMLImageElement | null>(resolve => {
@@ -181,100 +181,100 @@ export default function Results({ result, onRestart }: ResultsProps) {
     if (avatarImg) {
       ctx.save();
       ctx.beginPath();
-      ctx.arc(400, 70, 40, 0, Math.PI * 2);
+      ctx.arc(400, 80, 48, 0, Math.PI * 2);
       ctx.closePath();
       ctx.clip();
-      ctx.drawImage(avatarImg, 360, 30, 80, 80);
+      ctx.drawImage(avatarImg, 352, 32, 96, 96);
       ctx.restore();
     }
 
     ctx.textAlign = 'center';
     ctx.fillStyle = '#8A8270';
-    ctx.font = '14px "Cormorant Garamond", serif';
-    ctx.fillText('与你灵魂共振的干员', 400, avatarImg ? 140 : 80);
+    ctx.font = '18px "Cormorant Garamond", serif';
+    ctx.fillText('与你灵魂共振的干员', 400, avatarImg ? 165 : 90);
 
     ctx.fillStyle = '#E8E3D8';
-    ctx.font = 'bold 56px "Cormorant Garamond", serif';
-    ctx.fillText(op.name, 400, avatarImg ? 200 : 160);
+    ctx.font = 'bold 64px "Cormorant Garamond", serif';
+    ctx.fillText(op.name, 400, avatarImg ? 250 : 180);
 
     ctx.fillStyle = '#B8B0A0';
-    ctx.font = '16px "Noto Sans SC", sans-serif';
-    ctx.fillText(op.title, 400, avatarImg ? 235 : 200);
+    ctx.font = '20px "Noto Sans SC", sans-serif';
+    ctx.fillText(op.title, 400, avatarImg ? 290 : 220);
 
     // Radar chart area
-    const radarCX = 400, radarCY = 420, radarR = 150;
+    const radarCX = 400, radarCY = 460, radarR = 170;
     drawRadar(ctx, radarCX, radarCY, radarR, userCoords, op.coords, op.color, DIM_LABELS);
 
     // Legend
-    ctx.font = '12px "Cormorant Garamond", serif';
+    ctx.font = '14px "Cormorant Garamond", serif';
     ctx.fillStyle = '#E8E3D8';
-    ctx.fillRect(280, 530, 12, 12);
-    ctx.fillText('你的坐标', 300, 540);
+    ctx.fillRect(260, 600, 14, 14);
+    ctx.fillText('你的坐标', 284, 612);
     ctx.strokeStyle = op.color;
-    ctx.setLineDash([3, 3]);
-    ctx.strokeRect(440, 530, 12, 12);
+    ctx.setLineDash([4, 4]);
+    ctx.strokeRect(440, 600, 14, 14);
     ctx.setLineDash([]);
     ctx.fillStyle = op.color;
-    ctx.fillText(op.name, 460, 540);
+    ctx.fillText(op.name, 464, 612);
 
     // Compatibility
     ctx.fillStyle = '#E8E3D8';
-    ctx.font = 'bold 36px "Cormorant Garamond", serif';
-    ctx.fillText(`${compatible}%`, 400, 600);
+    ctx.font = 'bold 48px "Cormorant Garamond", serif';
+    ctx.fillText(`${compatible}%`, 400, 678);
     ctx.fillStyle = '#8A8270';
-    ctx.font = '14px "Cormorant Garamond", serif';
-    ctx.fillText('适配度', 400, 625);
+    ctx.font = '16px "Cormorant Garamond", serif';
+    ctx.fillText('适配度', 400, 705);
 
     // Persona excerpt
     ctx.fillStyle = '#B8B0A0';
-    ctx.font = '13px "Noto Sans SC", sans-serif';
-    let ty = 670;
+    ctx.font = '16px "Noto Sans SC", sans-serif';
+    let ty = 760;
     op.persona.slice(0, 2).forEach(t => {
       let line = '', ly = ty;
       for (const ch of t) {
         const testLine = line + ch;
-        if (ctx.measureText(testLine).width > 480) {
+        if (ctx.measureText(testLine).width > 520) {
           ctx.fillText(line, 400, ly);
           line = ch;
-          ly += 22;
+          ly += 26;
         } else line = testLine;
       }
       if (line) ctx.fillText(line, 400, ly);
-      ty = ly + 30;
+      ty = ly + 36;
     });
 
     // Tags
-    ty += 12;
+    ty += 16;
     op.tags.slice(0, 4).forEach((tag, i) => {
-      const x = 160 + i * 130;
+      const x = 150 + i * 140;
       ctx.strokeStyle = 'rgba(232,227,216,0.2)';
       ctx.lineWidth = 0.5;
-      const tw = ctx.measureText(tag).width + 20;
-      ctx.strokeRect(x - tw / 2, ty - 8, tw, 24);
+      const tw = ctx.measureText(tag).width + 24;
+      ctx.strokeRect(x - tw / 2, ty - 10, tw, 28);
       ctx.fillStyle = '#8A8270';
-      ctx.font = '12px "Cormorant Garamond", serif';
+      ctx.font = '14px "Cormorant Garamond", serif';
       ctx.fillText(tag, x, ty + 7);
     });
 
     // Top 3 section
-    ty += 50;
+    ty += 60;
     ctx.fillStyle = '#6A6050';
-    ctx.font = '11px "Cormorant Garamond", serif';
+    ctx.font = '14px "Cormorant Garamond", serif';
     ctx.fillText('— 其他匹配 —', 400, ty);
-    ty += 24;
+    ty += 30;
     ranking.slice(1, 4).forEach((m, i) => {
       ctx.fillStyle = '#8A8270';
-      ctx.font = '14px "Cormorant Garamond", serif';
+      ctx.font = '17px "Cormorant Garamond", serif';
       ctx.fillText(`#${i + 2} ${m.op.name} · ${m.compatible}%`, 400, ty);
-      ty += 22;
+      ty += 28;
     });
 
     // Footer
     ctx.fillStyle = '#5A5040';
+    ctx.font = '13px "Cormorant Garamond", serif';
+    ctx.fillText('罗德岛干员人格测试 · R.I. Personality Quiz', 400, H - 60);
     ctx.font = '11px "Cormorant Garamond", serif';
-    ctx.fillText('罗德岛干员人格测试 · R.I. Personality Quiz', 400, H - 50);
-    ctx.font = '9px "Cormorant Garamond", serif';
-    ctx.fillText(shareUrl, 400, H - 32);
+    ctx.fillText(shareUrl, 400, H - 38);
 
     const dataUrl = canvas.toDataURL('image/png');
     setShareImg(dataUrl);
