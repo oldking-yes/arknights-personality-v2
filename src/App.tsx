@@ -267,7 +267,7 @@ export default function App() {
 
 function DebugView({ onBack }: { onBack: () => void }) {
   const [selected, setSelected] = useState<Operator | null>(null);
-  const cdn = 'https://raw.githubusercontent.com/yuanyan3060/Arknights-Bot-Resource/main/avatar/';
+  const cdn = import.meta.env.BASE_URL + 'images/avatar/';
   const ARCHIVE_MSGS = [
     '档案室 · 已解锁干员 16/16',
     '罗德岛人事档案 · 加密等级 B',
@@ -317,15 +317,16 @@ function DebugView({ onBack }: { onBack: () => void }) {
 }
 
 function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
-  const baseCdn = 'https://raw.githubusercontent.com/yuanyan3060/Arknights-Bot-Resource/main/';
-  const avatarUrl = baseCdn + 'avatar/' + op.avatar.replace('#','%23') + '.png';
+  const basePath = import.meta.env.BASE_URL;
+  const avatarUrl = basePath + 'images/avatar/' + op.avatar.replace('#','%23') + '.png';
   const [heroFallback, setHeroFallback] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
+  const p = (s: string) => basePath + 'images/' + s;
   const portraitUrl = op.portrait
-    ? (op.portrait.startsWith('skin/') ? baseCdn + op.portrait.replace('#','%23') : baseCdn + 'portrait/' + op.portrait)
+    ? (op.portrait.startsWith('skin/') ? p(op.portrait.replace('#','%23')) : p('portrait/' + op.portrait))
     : heroFallback
-      ? baseCdn + 'portrait/' + op.avatar + '_1.png'
-      : baseCdn + 'skin/' + op.avatar.replace('#','%23') + '_2b.png';
+      ? p('portrait/' + op.avatar + '_1.png')
+      : p('skin/' + op.avatar.replace('#','%23') + '_2b.png');
 
   const detailMsgs = [
     '作战记录 #' + Math.floor(Math.random() * 9000 + 1000),

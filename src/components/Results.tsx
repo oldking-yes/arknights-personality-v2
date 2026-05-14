@@ -9,18 +9,17 @@ interface ResultsProps {
   onRestart: () => void;
 }
 
-const baseCdn = 'https://raw.githubusercontent.com/yuanyan3060/Arknights-Bot-Resource/main/';
-const avatarCdn = baseCdn + 'avatar/';
+const IMG = import.meta.env.BASE_URL + 'images/';
 
 function charUrl(op: { portrait?: string; avatar: string }, fallback: boolean) {
   if (op.portrait) {
     return op.portrait.startsWith('skin/')
-      ? baseCdn + op.portrait.replace('#', '%23')
-      : baseCdn + 'portrait/' + op.portrait;
+      ? IMG + op.portrait.replace('#', '%23')
+      : IMG + 'portrait/' + op.portrait;
   }
   return fallback
-    ? baseCdn + 'portrait/' + op.avatar + '_1.png'
-    : baseCdn + 'skin/' + op.avatar.replace('#', '%23') + '_2b.png';
+    ? IMG + 'portrait/' + op.avatar + '_1.png'
+    : IMG + 'skin/' + op.avatar.replace('#', '%23') + '_2b.png';
 }
 
 /** Draw a pentagon radar chart onto a canvas context */
@@ -174,7 +173,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
       img.crossOrigin = 'anonymous';
       img.onload = () => resolve(img);
       img.onerror = () => resolve(null);
-      img.src = avatarCdn + op.avatar.replace('#', '%23') + '.png';
+      img.src = IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png';
     });
 
     // Avatar circle
