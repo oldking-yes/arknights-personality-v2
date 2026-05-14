@@ -20,6 +20,10 @@ export interface Operator {
   tag: string;
   avatar: string;
   desc: string;
+  epigraph: string;
+  persona: string[];
+  soul: string[];
+  tags: string[];
 }
 
 export const DIM_LABELS = ['战术思维','情感方式','行动风格','秩序倾向','社交取向'];

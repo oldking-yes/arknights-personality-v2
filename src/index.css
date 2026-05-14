@@ -6,14 +6,17 @@
   --color-deep-700: #2D3238;
   --color-deep-600: #3D434A;
   --color-deep-500: #4D555E;
-  --color-card-bg: rgba(45, 50, 56, 0.8);
+  --color-card-bg: rgba(26, 28, 30, 0.85);
   --color-lemon: #F5E65C;
-  --color-lemon-dim: rgba(245, 230, 92, 0.15);
-  --color-lemon-glow: rgba(245, 230, 92, 0.3);
+  --color-lemon-dim: rgba(245, 230, 92, 0.12);
+  --color-lemon-glow: rgba(245, 230, 92, 0.25);
   --color-blue-accent: #4A8FE4;
-  --color-blue-dim: rgba(74, 143, 228, 0.15);
+  --color-blue-dim: rgba(74, 143, 228, 0.12);
   --color-orange-accent: #E8724A;
-  --color-orange-dim: rgba(232, 114, 74, 0.15);
+  --color-orange-dim: rgba(232, 114, 74, 0.12);
+  --color-warm-white: #E8E3D8;
+  --color-warm-muted: #B8B0A0;
+  --color-warm-dim: #8A8270;
   --color-slate-200: #D0D5DD;
   --color-slate-300: #B0B8C4;
   --color-slate-400: #8A94A2;
@@ -21,22 +24,188 @@
   --color-slate-600: #3D454F;
   --color-slate-700: #2D3238;
   --color-slate-800: #1A1C1E;
+  --font-serif-en: 'Cormorant Garamond', 'Georgia', 'Times New Roman', serif;
+  --font-serif-cn: 'Noto Sans SC', 'Songti SC', 'STSong', 'SimSun', '宋体', serif;
+  --font-sans: 'Space Grotesk', system-ui, sans-serif;
 }
 
 @layer base {
   body {
-    font-family: 'Space Grotesk', 'Noto Sans SC', system-ui, sans-serif;
+    font-family: var(--font-serif-cn);
     background: #0D0F11;
-    color: #B0B8C4;
+    color: var(--color-warm-white);
     margin: 0;
     min-height: 100dvh;
     overflow-x: hidden;
     -webkit-font-smoothing: antialiased;
+    line-height: 1.8;
   }
   ::selection {
     background: rgba(245, 230, 92, 0.2);
-    color: #D0D5DD;
+    color: var(--color-warm-white);
   }
+}
+
+/* herti-us inspired decorative ornaments */
+.ornament {
+  text-align: center;
+  color: rgba(245, 230, 92, 0.3);
+  font-size: 14px;
+  margin: 36px 0;
+  letter-spacing: 0.5em;
+  font-family: var(--font-serif-en);
+}
+
+/* Epigraph / quote block */
+.epigraph {
+  font-family: var(--font-serif-en);
+  font-style: italic;
+  font-size: 16px;
+  color: var(--color-warm-muted);
+  line-height: 1.7;
+  max-width: 360px;
+  margin: 0 auto;
+  padding: 20px 0;
+  border-top: 1px solid rgba(245, 230, 92, 0.12);
+  border-bottom: 1px solid rgba(245, 230, 92, 0.12);
+}
+
+/* Section label with decorative lines */
+.section-label {
+  font-family: var(--font-serif-en);
+  font-style: italic;
+  font-size: 12px;
+  color: var(--color-warm-dim);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::before,
+.section-label::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(245, 230, 92, 0.1);
+}
+
+/* Style tags */
+.tag {
+  font-family: var(--font-serif-en);
+  font-style: italic;
+  font-size: 13px;
+  padding: 6px 14px;
+  background: transparent;
+  border: 1px solid rgba(245, 230, 92, 0.2);
+  border-radius: 20px;
+  color: var(--color-warm-muted);
+}
+
+/* Soul card - dark card like herti.us */
+.soul-card {
+  margin: 32px 0;
+  padding: 32px 28px;
+  background: #1A1C1E;
+  border: 1px solid rgba(245, 230, 92, 0.06);
+  position: relative;
+}
+.soul-card::before {
+  content: '⬡';
+  position: absolute;
+  top: -14px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0D0F11;
+  padding: 0 12px;
+  font-size: 20px;
+  color: rgba(245, 230, 92, 0.4);
+  font-family: var(--font-serif-en);
+}
+.soul-label {
+  font-family: var(--font-serif-en);
+  font-style: italic;
+  font-size: 11px;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--color-warm-dim);
+  text-align: center;
+  margin-bottom: 18px;
+}
+.soul-name {
+  font-family: var(--font-serif-en);
+  font-size: 22px;
+  text-align: center;
+  margin-bottom: 4px;
+  letter-spacing: 0.04em;
+  color: #E8E3D8;
+}
+.soul-name-cn {
+  font-size: 13px;
+  text-align: center;
+  color: var(--color-warm-dim);
+  margin-bottom: 22px;
+  letter-spacing: 0.1em;
+}
+.soul-text {
+  font-size: 14px;
+  line-height: 1.85;
+  color: var(--color-warm-muted);
+  margin-bottom: 12px;
+}
+.soul-text:last-child { margin-bottom: 0; }
+.soul-text strong {
+  color: var(--color-warm-white);
+  font-weight: 500;
+}
+
+/* Relation cards */
+.relations {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-top: 28px;
+}
+.relation-card {
+  padding: 18px 16px;
+  background: rgba(26, 28, 30, 0.8);
+  border: 1px solid rgba(245, 230, 92, 0.08);
+  border-radius: 2px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.relation-card:hover {
+  border-color: rgba(245, 230, 92, 0.3);
+  background: rgba(26, 28, 30, 0.95);
+}
+.relation-label {
+  font-family: var(--font-serif-en);
+  font-style: italic;
+  font-size: 11px;
+  color: var(--color-warm-dim);
+  letter-spacing: 0.1em;
+  margin-bottom: 6px;
+}
+.relation-code {
+  font-family: var(--font-serif-en);
+  font-size: 26px;
+  color: var(--color-warm-white);
+  letter-spacing: 0.08em;
+  margin-bottom: 2px;
+}
+.relation-name {
+  font-size: 11px;
+  color: var(--color-warm-muted);
+}
+
+/* Persona text */
+.persona-text {
+  font-size: 15px;
+  color: var(--color-warm-white);
+  line-height: 1.85;
+  margin-bottom: 14px;
 }
 
 @media (prefers-reduced-motion: reduce) {

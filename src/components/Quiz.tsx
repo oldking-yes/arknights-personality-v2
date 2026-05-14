@@ -19,7 +19,6 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
     onAnswer(dim, val);
   }, [onAnswer]);
 
-  // Keyboard shortcuts: 1-4
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       const k = parseInt(e.key);
@@ -33,72 +32,75 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
   }, [question, handleSelect, currentQ, onPrev]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen px-4 py-8">
+    <div className="flex flex-col items-center justify-center min-h-screen px-6 py-8">
       <div className="w-full max-w-md">
-        {/* Dashboard-style Progress Bar */}
-        <div className="flex items-center gap-3 mb-6">
-          <div className="flex-1 h-1.5 bg-slate-700/50 overflow-hidden rounded-full shadow-[inset_0_1px_2px_rgba(0,0,0,0.3)]">
-            <motion.div
-              className="h-full rounded-full"
-              style={{ background: 'linear-gradient(90deg, #A89A20, #F5E65C)' }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.4, ease: 'easeOut' }}
-            />
-          </div>
-          <span className="font-mono text-xs text-lemon min-w-[3.5rem] text-right tabular-nums tracking-wider">
-            {currentQ + 1} / {QUESTIONS.length}
+        {/* header: section + progress */}
+        <div className="flex justify-between items-center mb-2">
+          <span className="font-serif-en italic text-xs tracking-[0.15em] text-warm-dim">战术情境</span>
+          <span className="font-serif-en text-xs tracking-[0.1em] text-warm-muted">
+            {String(currentQ + 1).padStart(2, '0')} / {String(QUESTIONS.length).padStart(2, '0')}
           </span>
         </div>
 
-        {/* Question card */}
+        {/* Minimal progress bar */}
+        <div className="h-px bg-white/10 mb-8 relative overflow-hidden">
+          <motion.div
+            className="absolute inset-y-0 left-0 bg-white"
+            animate={{ width: `${progress}%` }}
+            transition={{ duration: 0.4, ease: 'easeOut' }}
+          />
+        </div>
+
+        {/* Question */}
         <AnimatePresence mode="wait">
           <motion.div
             key={currentQ}
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={{ duration: 0.3, ease: 'easeOut' }}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.3 }}
           >
-            <div className="bg-card-bg backdrop-blur-sm border border-lemon-dim p-5 sm:p-6 mb-3">
-              <p className="text-base sm:text-lg font-medium leading-relaxed text-slate-200 mb-5">
-                {question.text}
-              </p>
+            <div className="mb-1 font-serif-en text-xs italic tracking-[0.1em] text-warm-dim">
+              Question {String(currentQ + 1).padStart(2, '0')}
+            </div>
+            <p className="text-lg font-medium leading-relaxed text-warm-white mb-8">
+              {question.text}
+            </p>
 
-              <div className="flex flex-col gap-2.5">
-                {question.opts.map((opt, i) => (
-                  <motion.button
-                    key={`${currentQ}-${i}`}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.06 }}
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => handleSelect(opt.dim, opt.val)}
-                    className="flex items-start gap-3 w-full p-3.5 sm:p-4 bg-slate-700/30 border border-slate-700/40 text-sm text-left leading-relaxed cursor-pointer transition-all duration-200 hover:border-lemon/50 hover:bg-lemon/5 active:border-lemon"
-                  >
-                    <span className="font-mono text-xs font-bold text-lemon min-w-[1.2rem] pt-0.5 shrink-0">
-                      {labels[i]}
-                    </span>
-                    <span className="text-slate-300">{opt.txt}</span>
-                  </motion.button>
-                ))}
-              </div>
+            <div className="flex flex-col gap-3">
+              {question.opts.map((opt, i) => (
+                <motion.button
+                  key={`${currentQ}-${i}`}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }}
+                  whileHover={{ scale: 1.005 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => handleSelect(opt.dim, opt.val)}
+                  className="flex items-start gap-3 w-full p-4 bg-white/5 border border-white/10 text-sm text-left leading-relaxed cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-white/20 active:bg-white/[0.12]"
+                >
+                  <span className="font-serif-en italic text-sm text-warm-dim min-w-[1.2rem] shrink-0">
+                    {labels[i]}
+                  </span>
+                  <span className="text-warm-white/90">{opt.txt}</span>
+                </motion.button>
+              ))}
             </div>
           </motion.div>
         </AnimatePresence>
 
         {/* Navigation */}
-        <div className="flex justify-between items-center mt-2">
+        <div className="flex justify-between items-center mt-8">
           {currentQ > 0 ? (
             <button
               onClick={onPrev}
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-white/5 border border-slate-700 text-slate-500 font-mono text-xs tracking-wider uppercase cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-slate-500 hover:text-white"
+              className="px-4 py-2 bg-transparent border border-white/10 text-warm-dim font-serif-cn text-xs tracking-[0.2em] cursor-pointer transition-all duration-200 hover:bg-white/[0.05] hover:text-warm-muted hover:border-white/20"
             >
-              &#x2039; 上一题
+              ← 上一题
             </button>
           ) : <div />}
-          <span className="font-mono text-[0.6rem] text-slate-600 tracking-widest uppercase ml-auto">
-            键盘 1-4 &#xB7; Backspace 返回
+          <span className="font-serif-en text-[0.55rem] tracking-widest text-warm-dim/60">
+            1–4 选择 · Backspace 返回
           </span>
         </div>
       </div>

@@ -8,7 +8,6 @@ import { findBestMatch } from './utils/matching';
 import { saveProgress, loadProgress, clearProgress } from './utils/storage';
 import type { Stage, AnswerRecord } from './data/types';
 
-
 const TOTAL = QUESTIONS.length;
 
 export default function App() {
@@ -49,7 +48,6 @@ export default function App() {
     setCurrentQ(p => p+1);
   }, []);
 
-  // When currentQ reaches end, compute result
   useEffect(() => {
     if (currentQ >= TOTAL && stage === 'quiz') {
       const r = findBestMatch(scores);
@@ -77,38 +75,16 @@ export default function App() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-deep-900 relative overflow-hidden">
-      {/* Grid background */}
+    <div className="min-h-screen bg-deep-900 relative">
+      {/* Subtle grid overlay */}
       <div className="fixed inset-0 pointer-events-none z-0"
         style={{
-          backgroundImage: 'linear-gradient(rgba(245,230,92,.025) 1px, transparent 1px), linear-gradient(90deg, rgba(245,230,92,.025) 1px, transparent 1px)',
-          backgroundSize: '40px 40px'
+          backgroundImage: 'linear-gradient(rgba(232,227,216,.02) 1px, transparent 1px), linear-gradient(90deg, rgba(232,227,216,.02) 1px, transparent 1px)',
+          backgroundSize: '48px 48px'
         }}
       />
-      <div className="fixed inset-0 pointer-events-none z-0"
-        style={{ background: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.03) 2px, rgba(0,0,0,.03) 4px)' }}
-      />
 
-      {/* Floating particles - lemon yellow + tech blue + orange */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-        {Array.from({length:24}).map((_,i) => {
-          const colors = ['rgba(245,230,92,0.2)', 'rgba(74,143,228,0.15)', 'rgba(232,114,74,0.12)'];
-          return (
-            <div key={i} className="absolute w-[2px] h-[2px] rounded-full"
-              style={{
-                left:`${Math.random()*100}%`, top:`${Math.random()*100}%`,
-                backgroundColor: colors[i % 3],
-                animation:`pulse ${2+Math.random()*3}s ease-in-out infinite`,
-                animationDelay:`${Math.random()*3}s`
-              }}
-            />
-          );
-        })}
-      </div>
-
-      <style>{`@keyframes pulse{0%,100%{opacity:0}50%{opacity:1}}`}</style>
-
-      <div className="relative z-10 w-full max-w-lg mx-auto px-3">
+      <div className="relative z-10 w-full max-w-lg mx-auto">
         <AnimatePresence mode="wait">
           {stage==='intro' && <Intro key="intro" onStart={startQuiz} onRandom={randomQuiz} />}
           {stage==='quiz' && currentQ < TOTAL && <Quiz key="quiz" currentQ={currentQ} onAnswer={handleAnswer} onPrev={handlePrev} />}

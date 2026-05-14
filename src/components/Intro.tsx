@@ -10,70 +10,77 @@ export default function Intro({ onStart, onRandom }: IntroProps) {
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      exit={{ opacity: 0, scale: 0.97 }}
-      className="flex flex-col items-center justify-center min-h-screen px-5 text-center"
+      exit={{ opacity: 0 }}
+      className="flex flex-col items-center justify-center min-h-screen px-9 py-20 text-center"
     >
-      <div className="w-full max-w-md">
+      <div className="w-full max-w-xs">
         <motion.div
-          initial={{ y: 30, opacity: 0 }}
+          initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.15, duration: 0.7 }}
+          transition={{ duration: 0.8 }}
         >
-          {/* Logo hex */}
-          <div className="w-20 h-24 mx-auto mb-6">
-            <svg viewBox="0 0 120 140" className="w-full h-full">
-              <polygon points="60,5 115,35 115,105 60,135 5,105 5,35" fill="none" stroke="#F5E65C" strokeWidth="1.5" opacity="0.6"/>
-              <polygon points="60,20 100,42 100,98 60,120 20,98 20,42" fill="none" stroke="#F5E65C" strokeWidth="0.8" opacity="0.3"/>
-              <text x="60" y="82" textAnchor="middle" fill="#F5E65C" fontFamily="sans-serif" fontSize="28" fontWeight="bold">R.I.</text>
-            </svg>
+          {/* Logo - subtle hex */}
+          <div className="font-serif-en text-sm tracking-[0.4em] text-warm-dim mb-2">
+            R.I.
           </div>
-
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight text-white mb-2">
-            罗德岛干员人格测试
-          </h1>
-          <p className="text-xs tracking-[0.25em] text-lemon uppercase mb-1">
-            Arknights Operator Personality Assessment
-          </p>
-          <div className="w-14 h-0.5 mx-auto my-4 bg-gradient-to-r from-transparent via-lemon to-transparent" />
-
-          <p className="text-sm text-slate-500 leading-relaxed mb-8">
-            15 道战术情境题 &#xB7; 5 维人格图谱 &#xB7; 16 位干员匹配<br />
-            找到与你的灵魂共振的那位干员。
-          </p>
+          <div className="font-serif-en italic text-xs tracking-[0.15em] text-warm-muted mb-12">
+            — a personality map of Rhodes Island —
+          </div>
         </motion.div>
 
         <motion.div
           initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="flex flex-col items-center gap-3"
+          transition={{ delay: 0.2, duration: 0.8 }}
+        >
+          <h1 className="font-serif-en text-5xl font-normal tracking-[0.08em] leading-tight text-white mb-4">
+            R.I.
+          </h1>
+          <p className="text-xl font-normal tracking-[0.3em] text-warm-white mb-12">
+            罗德岛干员人格测试
+          </p>
+
+          <p className="font-serif-cn text-sm leading-relaxed text-warm-muted max-w-[280px] mx-auto mb-2">
+            战场上的选择，照见你灵魂的形状。<br />
+            十五道战术情境题，<em className="font-serif-en italic text-warm-dim">找到与你的频率共振的那位干员。</em>
+          </p>
+
+          <div className="ornament">· · ·</div>
+
+          <p className="font-serif-en italic text-xs tracking-[0.15em] text-warm-dim mb-8">
+            16 operators · 15 questions · 3 min
+          </p>
+        </motion.div>
+
+        <motion.div
+          initial={{ y: 15, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
         >
           <button
             onClick={onStart}
-            className="inline-flex items-center gap-2 px-10 py-3.5 bg-lemon/15 border border-lemon/60 text-lemon font-mono text-sm tracking-widest uppercase cursor-pointer transition-all duration-300 hover:bg-lemon/25 hover:border-lemon hover:shadow-[0_0_20px_rgba(245,230,92,0.15)] active:scale-95"
+            className="inline-block px-14 py-4 bg-white text-deep-900 font-serif-cn text-sm tracking-[0.3em] cursor-pointer transition-all duration-300 hover:bg-warm-white active:scale-[0.97]"
           >
-            &#x25B6; 开始测试
+            开 始 测 试
           </button>
-          <button
-            onClick={onRandom}
-            className="inline-flex items-center gap-2 px-6 py-2.5 bg-white/5 border border-slate-700 text-slate-500 font-mono text-xs tracking-widest uppercase cursor-pointer transition-all duration-300 hover:bg-white/10 hover:border-slate-500 hover:text-white active:scale-95"
-          >
-            &#x26A1; 直接看结果
-          </button>
+
+          <p className="font-serif-en italic text-xs tracking-[0.1em] text-warm-dim mt-4">
+           请在安静的时刻打开
+          </p>
         </motion.div>
 
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.8 }}
-          className="mt-8 flex gap-2 justify-center"
+          transition={{ delay: 0.9, duration: 0.6 }}
+          className="mt-16"
         >
-          <span className="font-mono text-[0.55rem] tracking-widest px-2 py-1 border border-slate-700 text-slate-600 bg-white/[0.02]">
-            VERSION 2.0
-          </span>
-          <span className="font-mono text-[0.55rem] tracking-widest px-2 py-1 border border-slate-700 text-slate-600 bg-white/[0.02]">
-            RHODES ISLAND
-          </span>
+          <button
+            onClick={onRandom}
+            className="font-serif-cn text-xs tracking-[0.16em] text-warm-dim border-b border-transparent border-dotted cursor-pointer transition-all duration-200 hover:text-warm-muted hover:border-warm-dim bg-transparent pb-0.5"
+          >
+            ⚡ 直接看结果
+          </button>
         </motion.div>
       </div>
     </motion.div>
