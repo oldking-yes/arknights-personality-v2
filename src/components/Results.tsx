@@ -9,7 +9,7 @@ interface ResultsProps {
   onRestart: () => void;
 }
 
-const cdn = 'https://cdn.jsdelivr.net/gh/fexli/ArknightsResource@latest/portrait/';
+const cdn = 'https://raw.githubusercontent.com/Aceship/Arknight-Images/main/avatars/';
 
 export default function Results({ result, onRestart }: ResultsProps) {
   const { op, compatible, userCoords } = result;
@@ -53,39 +53,54 @@ export default function Results({ result, onRestart }: ResultsProps) {
         id="result-content"
         className="flex flex-col items-center min-h-screen px-0 py-0"
       >
-        {/* Hero section - portrait as background */}
-        <div className="relative w-full overflow-hidden mb-0" style={{ minHeight: '70vh' }}>
-          {/* Portrait background */}
-          <div className="absolute inset-0 z-0 flex items-center justify-center">
-            <img
-              src={imgUrl}
-              alt=""
-              className="w-full h-full object-cover opacity-30"
-              style={{ filter: 'brightness(0.5) saturate(0.8)', objectPosition: 'top center' }}
-              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
-            />
-            <div className="absolute inset-0" style={{
-              background: 'linear-gradient(to bottom, rgba(13,15,17,0.3) 0%, rgba(13,15,17,0.6) 60%, #0D0F11 100%)'
-            }} />
-          </div>
+        {/* Hero section - color + avatar */}
+        <div className="relative w-full overflow-hidden mb-0" style={{ minHeight: '65vh' }}>
+          {/* Color glow background */}
+          <div className="absolute inset-0 z-0 opacity-20"
+            style={{
+              background: `radial-gradient(ellipse at 50% 30%, ${op.color} 0%, transparent 60%)`,
+            }}
+          />
+          {/* Subtle hex pattern */}
+          <div className="absolute inset-0 z-0 opacity-[0.04]"
+            style={{
+              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='52' viewBox='0 0 60 52'%3E%3Cpolygon points='30,2 56,16 56,44 30,52 4,44 4,16' fill='none' stroke='${encodeURIComponent(op.color)}' stroke-width='0.5'/%3E%3C/svg%3E")`,
+              backgroundSize: '60px 52px',
+            }}
+          />
+          <div className="absolute inset-0" style={{
+            background: 'linear-gradient(to bottom, rgba(13,15,17,0) 40%, #0D0F11 100%)'
+          }} />
 
-          {/* Content on top of portrait */}
-          <div className="relative z-10 flex flex-col items-center justify-end min-h-[70vh] px-8 pb-8 text-center">
+          {/* Content */}
+          <div className="relative z-10 flex flex-col items-center justify-end min-h-[65vh] px-8 pb-8 text-center">
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1, duration: 0.8 }}
+              className="flex flex-col items-center"
             >
+              {/* Avatar */}
+              <div className="w-24 h-24 rounded-full overflow-hidden border-2 mb-5"
+                style={{ borderColor: `${op.color}60` }}>
+                <img src={imgUrl} alt={op.name} className="w-full h-full object-cover"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
+              </div>
+
               <div className="font-serif-en italic text-sm tracking-[0.15em] text-warm-dim mb-3">
                 与你灵魂共振的干员
               </div>
               <h2 className="font-serif-en text-6xl font-normal tracking-[0.08em] text-white mb-2">
                 {op.name}
               </h2>
-              <p className="text-lg tracking-[0.08em] text-warm-muted mb-6">
+              <p className="font-serif-cn text-base tracking-[0.08em] text-warm-muted mb-6">
                 {op.title}
               </p>
-              <div className="ornament" style={{ margin: '16px 0' }}>· · ·</div>
+              <div className="font-serif-en text-xs tracking-widest px-3 py-1 mb-4"
+                style={{ color: op.color, border: `1px solid ${op.color}40` }}>
+                {op.tag} · {op.clazz}
+              </div>
+              <div className="ornament" style={{ margin: '8px 0' }}>· · ·</div>
             </motion.div>
           </div>
         </div>
