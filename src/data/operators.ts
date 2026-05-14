@@ -1,7 +1,7 @@
 import type { Operator } from './types';
 
 export const OPERATORS: Operator[] = [
-  { id:'amiya', name:'阿米娅', title:'罗德岛公开领袖', clazz:'术师', stars:5,
+  { id:'amiya', name:'阿米娅', title:'罗德岛公开领袖·医疗', clazz:'术师', stars:5,
     coords:[5,9,6,5,7], color:'#00b8ff', tag:'INFJ', avatar:'char_002_amiya',
     desc:'年仅14岁的卡特斯少女，罗德岛的公开领袖。拥有卓越的情感共鸣力和不输成年人的决断力。',
     epigraph:'"我始终相信，理解是通向和平的唯一道路。"',
@@ -30,7 +30,7 @@ export const OPERATORS: Operator[] = [
       '赤霄剑法讲究"招出无悔"，但晖洁后来领悟到：真正的剑意是在明知有悔、明知不可为之后，仍然选择向前。'
     ],
     tags:['规则守护者','雷厉风行','赤霄之心','黑白分明'] },
-  { id:'silverash', name:'银灰', title:'喀兰贸易董事长', clazz:'近卫', stars:6,
+  { id:'silverash', name:'凛御银灰', title:'喀兰贸易董事长', clazz:'近卫', stars:6,
     coords:[9,2,7,8,5], color:'#c0c0c0', tag:'ENTJ', avatar:'char_172_svrash',
     desc:'希瓦艾什家族族长。棋手思维——永远领先三步。',
     epigraph:'"最好的防御不是躲在盾牌后面，是让别人不敢攻击你。"',
@@ -135,7 +135,7 @@ export const OPERATORS: Operator[] = [
       '<strong>她是 BLAZE。她是那不灭的火。</strong>'
     ],
     tags:['不灭的火焰','热血沸腾','勇往直前','电锯轰鸣'] },
-  { id:'kaltsit', name:'凯尔希', title:'罗德岛医疗主管', clazz:'医疗', stars:6,
+  { id:'kaltsit', name:'凯尔希·思衡托', title:'罗德岛医疗主管', clazz:'医疗', stars:6,
     coords:[9,3,5,8,3], color:'#44cc88', tag:'INTP', avatar:'char_003_kalts',
     desc:'罗德岛医疗部负责人。Mon3tr 是她最温和的一面。',
     epigraph:'"真理不需要被任何人喜欢。它只需要被知道。"',
@@ -195,7 +195,7 @@ export const OPERATORS: Operator[] = [
       '<strong>她是 ANGELINA。她是那杯永远不会冷的茶。</strong>'
     ],
     tags:['温柔的引力','治愈','善良的勇气','信使'] },
-  { id:'hoshiguma', name:'星熊', title:'龙门近卫局干员', clazz:'重装', stars:5,
+  { id:'hoshiguma', name:'斩业星熊', title:'龙门近卫局干员', clazz:'重装', stars:5,
     coords:[6,6,5,8,7], color:'#44dd44', tag:'ISFJ', avatar:'char_136_hsguma',
     desc:'龙门近卫局干员。陈的搭档。般若的持有者。',
     epigraph:'"真正的勇气不是无所畏惧。是带着恐惧，仍然站在那里。"',
