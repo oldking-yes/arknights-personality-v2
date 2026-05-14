@@ -23,27 +23,94 @@ export default function Results({ result, onRestart }: ResultsProps) {
     label, user: userCoords[i], op: op.coords[i]
   }));
 
-  const generateShareCard = async () => {
-    try {
-      const el = document.getElementById('result-content');
-      if (!el) return;
-      const html2canvas = (await import('html2canvas')).default;
-      const canvas = await html2canvas(el, {
-        backgroundColor: '#0D0F11',
-        scale: 2,
-        useCORS: true,
-      });
-      const dataUrl = canvas.toDataURL('image/png');
-      setShareImg(dataUrl);
-      setShowShare(true);
-    } catch {}
-  };
+  const generateShareCard = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 1000;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
 
-  const downloadCard = () => {
-    if (!shareImg) return;
+    ctx.fillStyle = '#0D0F11';
+    ctx.fillRect(0, 0, 800, 1000);
+
+    ctx.strokeStyle = 'rgba(232,227,216,0.04)';
+    ctx.lineWidth = 0.5;
+    for (let r = 0; r < 20; r++) {
+      for (let c = 0; c < 16; c++) {
+        const cx = c * 52 + (r % 2) * 26, cy = r * 45;
+        ctx.beginPath();
+        for (let i = 0; i < 6; i++) {
+          const a = (i * 60 - 30) * Math.PI / 180;
+          const x = cx + 24 * Math.cos(a), y = cy + 24 * Math.sin(a);
+          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+        }
+        ctx.closePath(); ctx.stroke();
+      }
+    }
+
+    const grad = ctx.createRadialGradient(400, 200, 20, 400, 200, 400);
+    grad.addColorStop(0, op.color + '30');
+    grad.addColorStop(1, 'transparent');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 800, 600);
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#8A8270';
+    ctx.font = '16px "Cormorant Garamond", serif';
+    ctx.fillText('与你灵魂共振的干员', 400, 80);
+    ctx.fillStyle = '#E8E3D8';
+    ctx.font = 'bold 64px "Cormorant Garamond", serif';
+    ctx.fillText(op.name, 400, 170);
+    ctx.fillStyle = '#B8B0A0';
+    ctx.font = '18px "Noto Sans SC", sans-serif';
+    ctx.fillText(op.title, 400, 210);
+    ctx.fillStyle = 'rgba(232,227,216,0.2)';
+    ctx.fillRect(300, 240, 200, 1);
+
+    ctx.fillStyle = '#D0C8B8';
+    ctx.font = '15px "Noto Sans SC", sans-serif';
+    let ty = 280;
+    op.persona.slice(0, 2).forEach(t => {
+      const words = t.split('');
+      let line = '', ly = ty;
+      for (const ch of words) {
+        if (ctx.measureText(line + ch).width > 520) {
+          ctx.fillText(line, 400, ly); line = ch; ly += 24;
+        } else line += ch;
+      }
+      if (line) ctx.fillText(line, 400, ly);
+      ty = ly + 36;
+    });
+
+    ty += 16;
+    ctx.fillStyle = '#8A8270';
+    ctx.font = '20px "Cormorant Garamond", serif';
+    ctx.fillText(`适配度 ${compatible}%`, 400, ty);
+    ty += 44;
+    op.tags.slice(0, 4).forEach((tag, i) => {
+      const x = 200 + i * 110;
+      ctx.strokeStyle = 'rgba(232,227,216,0.2)';
+      ctx.lineWidth = 1;
+      const tw = ctx.measureText(tag).width + 24;
+      ctx.strokeRect(x - tw / 2, ty - 10, tw, 28);
+      ctx.fillStyle = '#B8B0A0';
+      ctx.font = '14px "Cormorant Garamond", serif';
+      ctx.fillText(tag, x, ty + 5);
+    });
+
+    ctx.fillStyle = '#6A6050';
+    ctx.font = '12px "Cormorant Garamond", serif';
+    ctx.fillText('罗德岛干员人格测试 · R.I. Personality Quiz', 400, 950);
+    ctx.font = '10px "Cormorant Garamond", serif';
+    ctx.fillStyle = '#5A5040';
+    ctx.fillText('arknights-personality-v2', 400, 975);
+
+    const dataUrl = canvas.toDataURL('image/png');
+    setShareImg(dataUrl);
+    setShowShare(true);
     const a = document.createElement('a');
     a.download = `arknights-${op.id}.png`;
-    a.href = shareImg;
+    a.href = dataUrl;
     a.click();
   };
 
@@ -63,7 +130,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
               src={charUrl}
               alt=""
               className="w-full h-full object-contain opacity-60"
-              style={{ filter: 'brightness(0.4) saturate(0.9)', objectPosition: 'center 20%' }}
+              style={{ filter: 'brightness(0.65) saturate(1)', objectPosition: 'center 20%' }}
               onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
             />
             <div className="absolute inset-0" style={{
