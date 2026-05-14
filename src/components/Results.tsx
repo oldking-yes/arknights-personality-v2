@@ -9,11 +9,13 @@ interface ResultsProps {
   onRestart: () => void;
 }
 
-const cdn = 'https://raw.githubusercontent.com/Aceship/Arknight-Images/main/avatars/';
+const avatarCdn = 'https://raw.githubusercontent.com/Aceship/Arknight-Images/main/avatars/';
+const charCdn = 'https://raw.githubusercontent.com/Aceship/Arknight-Images/main/characters/';
 
 export default function Results({ result, onRestart }: ResultsProps) {
   const { op, compatible, userCoords } = result;
-  const imgUrl = cdn + op.avatar + '.png';
+  const avatarUrl = avatarCdn + op.avatar + '.png';
+  const charUrl = charCdn + op.avatar + '_1.png';
   const [showShare, setShowShare] = useState(false);
   const [shareImg, setShareImg] = useState('');
 
@@ -53,40 +55,30 @@ export default function Results({ result, onRestart }: ResultsProps) {
         id="result-content"
         className="flex flex-col items-center min-h-screen px-0 py-0"
       >
-        {/* Hero section - color + avatar */}
-        <div className="relative w-full overflow-hidden mb-0" style={{ minHeight: '65vh' }}>
-          {/* Color glow background */}
-          <div className="absolute inset-0 z-0 opacity-20"
-            style={{
-              background: `radial-gradient(ellipse at 50% 30%, ${op.color} 0%, transparent 60%)`,
-            }}
-          />
-          {/* Subtle hex pattern */}
-          <div className="absolute inset-0 z-0 opacity-[0.04]"
-            style={{
-              backgroundImage: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='52' viewBox='0 0 60 52'%3E%3Cpolygon points='30,2 56,16 56,44 30,52 4,44 4,16' fill='none' stroke='${encodeURIComponent(op.color)}' stroke-width='0.5'/%3E%3C/svg%3E")`,
-              backgroundSize: '60px 52px',
-            }}
-          />
-          <div className="absolute inset-0" style={{
-            background: 'linear-gradient(to bottom, rgba(13,15,17,0) 40%, #0D0F11 100%)'
-          }} />
+        {/* Hero section - full character art background */}
+        <div className="relative w-full overflow-hidden mb-0" style={{ minHeight: '85vh' }}>
+          {/* Character art */}
+          <div className="absolute inset-0 z-0 flex items-start justify-center">
+            <img
+              src={charUrl}
+              alt=""
+              className="w-full h-full object-contain opacity-60"
+              style={{ filter: 'brightness(0.4) saturate(0.9)', objectPosition: 'center 20%' }}
+              onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+            />
+            <div className="absolute inset-0" style={{
+              background: 'linear-gradient(to bottom, rgba(13,15,17,0.1) 0%, rgba(13,15,17,0.5) 50%, #0D0F11 100%)'
+            }} />
+          </div>
 
-          {/* Content */}
-          <div className="relative z-10 flex flex-col items-center justify-end min-h-[65vh] px-8 pb-8 text-center">
+          {/* Content on top */}
+          <div className="relative z-10 flex flex-col items-center justify-end min-h-[85vh] px-8 pb-10 text-center">
             <motion.div
               initial={{ y: 20, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.1, duration: 0.8 }}
               className="flex flex-col items-center"
             >
-              {/* Avatar */}
-              <div className="w-24 h-24 rounded-full overflow-hidden border-2 mb-5"
-                style={{ borderColor: `${op.color}60` }}>
-                <img src={imgUrl} alt={op.name} className="w-full h-full object-cover"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
-              </div>
-
               <div className="font-serif-en italic text-sm tracking-[0.15em] text-warm-dim mb-3">
                 与你灵魂共振的干员
               </div>
@@ -250,7 +242,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
                   保存图片
                 </button>
                 <button
-                  onClick={() => { navigator.clipboard.writeText(`我在罗德岛干员人格测试中匹配到了「${op.name}」！适配度 ${compatible}% —— 你也来测测看！`); }}
+                  onClick={() => { navigator.clipboard.writeText(`我在罗德岛干员人格测试中匹配到了「${op.name}」！适配度 ${compatible}% —— 你也来测测看！ https://oldking-yes.github.io/arknights-personality-v2/`); }}
                   className="px-8 py-3 bg-transparent text-warm-muted border border-white/20 font-serif-cn text-sm tracking-[0.2em] cursor-pointer transition-all duration-300 hover:text-warm-white hover:border-white/40"
                 >
                   复制分享
