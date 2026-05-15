@@ -22,4 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
-node_modules
+
+# AI assistant config (local only, not for GitHub)
+CLAUDE.md
+
+# Playwright test artifacts
+screenshots/
+test-results/
+
+# Audit/test scripts
+audit-report/
+audit-test.mjs
