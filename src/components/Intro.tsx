@@ -61,17 +61,47 @@ export default function Intro({ onStart, onRandom, onShowAll, onPrtsToggle }: In
       exit={{ opacity: 0 }}
       className="flex flex-col items-center justify-center min-h-screen px-9 py-20 text-center relative overflow-hidden"
     >
-      {/* PRTS hex — clickable to invoke terminal */}
+      {/* PRTS hex — rotating concentric rings with vertex dots, clickable for terminal */}
       <button onClick={onPrtsToggle}
-        className="fixed prts-hex cursor-pointer select-none z-10 transition-all duration-300 hover:scale-110 hover:opacity-80"
-        style={{ color: 'rgba(74, 143, 228, 0.2)', top: '10%', left: '5%', width: '120px', height: '120px' }}>
-        <svg viewBox="0 0 100 100" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="0.8">
-          <polygon points="50,5 95,27.5 95,72.5 50,95 5,72.5 5,27.5" />
-          <polygon points="50,20 80,35 80,65 50,80 20,65 20,35" strokeWidth="0.4" />
-          <line x1="50" y1="5" x2="50" y2="95" strokeWidth="0.3" />
-          <line x1="5" y1="50" x2="95" y2="50" strokeWidth="0.3" />
-          <line x1="27.5" y1="17.5" x2="72.5" y2="82.5" strokeWidth="0.3" />
-          <line x1="72.5" y1="17.5" x2="27.5" y2="82.5" strokeWidth="0.3" />
+        className="fixed cursor-pointer select-none z-10 transition-all duration-500 hover:scale-110 hover:opacity-80 hex-glow"
+        style={{ top: '10%', left: '5%', width: '130px', height: '130px' }}>
+        <svg viewBox="0 0 120 120" className="w-full h-full" fill="none">
+          {/* Outer ring — slow */}
+          <g className="hex-spin-slow">
+            <polygon points="60,5 107,32.5 107,87.5 60,115 13,87.5 13,32.5"
+              stroke="rgba(74,143,228,0.12)" strokeWidth="0.6" />
+            <polygon points="60,5 107,32.5 107,87.5 60,115 13,87.5 13,32.5"
+              stroke="rgba(74,143,228,0.08)" strokeWidth="0.2"
+              transform="scale(1.15) translate(-7.5,-7.5)" />
+            {/* Vertex dots */}
+            {[0,60,120,180,240,300].map((a,i) => {
+              const rad = a * Math.PI / 180;
+              const cx = 60 + 45 * Math.sin(rad);
+              const cy = 60 - 45 * Math.cos(rad);
+              return <circle key={i} cx={cx} cy={cy} r="1.5" fill="rgba(74,143,228,0.25)" />;
+            })}
+          </g>
+          {/* Middle ring — reverse */}
+          <g className="hex-spin-mid">
+            <polygon points="60,17 93,34 93,86 60,103 27,86 27,34"
+              stroke="rgba(74,143,228,0.09)" strokeWidth="0.5" />
+            {[0,60,120,180,240,300].map((a,i) => {
+              const rad = a * Math.PI / 180;
+              const cx = 60 + 33 * Math.sin(rad);
+              const cy = 60 - 33 * Math.cos(rad);
+              return <circle key={i} cx={cx} cy={cy} r="1" fill="rgba(74,143,228,0.2)" />;
+            })}
+          </g>
+          {/* Inner ring — fast */}
+          <g className="hex-spin-fast">
+            <polygon points="60,27 80,38 80,82 60,93 40,82 40,38"
+              stroke="rgba(74,143,228,0.06)" strokeWidth="0.4" />
+          </g>
+          {/* Center dot */}
+          <circle cx="60" cy="60" r="1.5" fill="rgba(74,143,228,0.3)" />
+          {/* Crosshair */}
+          <line x1="58" y1="60" x2="62" y2="60" stroke="rgba(74,143,228,0.08)" strokeWidth="0.5" />
+          <line x1="60" y1="58" x2="60" y2="62" stroke="rgba(74,143,228,0.08)" strokeWidth="0.5" />
         </svg>
         <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 font-mono text-[0.4rem] tracking-[0.2em] text-blue-accent/30 whitespace-nowrap">
           PRTS
@@ -85,18 +115,125 @@ export default function Intro({ onStart, onRandom, onShowAll, onPrtsToggle }: In
         </svg>
       </div>
 
-      {/* Hand reaching motif — clickable for Priestess whisper */}
+      {/* PRTS constellation hand — reaching hologram, clickable for Priestess whisper */}
       <button ref={handRef} onClick={handleHandClick}
-        className="fixed hand-reach cursor-pointer select-none z-10 transition-all duration-300 hover:scale-110 hover:opacity-80"
-        style={{ color: 'rgba(74, 143, 228, 0.12)', bottom: '8%', left: '3%', width: '60px', height: '80px' }}>
-        <svg viewBox="0 0 60 80" className="w-full h-full" fill="none" stroke="currentColor" strokeWidth="1.2">
-          <path d="M30,5 C30,5 20,20 15,35 C12,45 16,52 22,52 C26,52 28,48 28,48
-            L28,62 C28,68 32,72 34,72 C36,72 38,68 38,62 L38,48
-            C40,50 44,52 48,48 C50,44 48,38 45,32 C42,26 38,12 36,6 Z"
-          />
-          <path d="M22,52 C18,55 14,58 18,62 C22,66 28,62 28,62" strokeWidth="0.8" />
+        className="fixed hand-reach cursor-pointer select-none z-10 transition-all duration-500 hover:scale-110 hover:opacity-90"
+        style={{ bottom: '8%', left: '2%', width: '90px', height: '110px' }}>
+        <svg viewBox="0 0 100 100" className="w-full h-full" fill="none">
+          {/* Joint connections (wireframe mesh) */}
+          <g stroke="rgba(74,143,228,0.2)" strokeWidth="0.5">
+            {/* Wrist */}
+            <line x1="15" y1="85" x2="30" y2="78" />
+            <line x1="30" y1="78" x2="45" y2="85" />
+            {/* Palm */}
+            <line x1="30" y1="78" x2="30" y2="65" />
+            <line x1="18" y1="70" x2="42" y2="70" />
+            <line x1="30" y1="65" x2="18" y2="70" />
+            <line x1="30" y1="65" x2="42" y2="70" />
+            <line x1="15" y1="85" x2="18" y2="70" />
+            <line x1="45" y1="85" x2="42" y2="70" />
+            {/* Thumb */}
+            <line x1="18" y1="70" x2="14" y2="60" />
+            <line x1="14" y1="60" x2="10" y2="48" />
+            {/* Index */}
+            <line x1="18" y1="70" x2="22" y2="52" />
+            <line x1="30" y1="65" x2="22" y2="52" />
+            <line x1="22" y1="52" x2="20" y2="38" />
+            <line x1="20" y1="38" x2="22" y2="22" />
+            {/* Middle */}
+            <line x1="30" y1="65" x2="30" y2="50" />
+            <line x1="30" y1="50" x2="30" y2="34" />
+            <line x1="30" y1="34" x2="32" y2="18" />
+            {/* Ring */}
+            <line x1="42" y1="70" x2="38" y2="52" />
+            <line x1="30" y1="65" x2="38" y2="52" />
+            <line x1="38" y1="52" x2="40" y2="38" />
+            <line x1="40" y1="38" x2="44" y2="24" />
+            {/* Pinky */}
+            <line x1="42" y1="70" x2="44" y2="56" />
+            <line x1="44" y1="56" x2="50" y2="46" />
+            <line x1="50" y1="46" x2="54" y2="36" />
+            {/* Cross palm connections */}
+            <line x1="22" y1="52" x2="30" y2="50" />
+            <line x1="30" y1="50" x2="38" y2="52" />
+          </g>
+
+          {/* Joint dots */}
+          <g fill="rgba(74,143,228,0.35)">
+            {/* Wrist */}
+            <circle cx="15" cy="85" r="1.2" />
+            <circle cx="30" cy="78" r="1.5" />
+            <circle cx="45" cy="85" r="1.2" />
+            {/* Palm */}
+            <circle cx="30" cy="65" r="1.8" />
+            <circle cx="18" cy="70" r="1.2" />
+            <circle cx="42" cy="70" r="1.2" />
+            {/* Thumb */}
+            <circle cx="14" cy="60" r="1" />
+            <circle cx="10" cy="48" r="1.2" />
+            {/* Index */}
+            <circle cx="22" cy="52" r="1.2" />
+            <circle cx="20" cy="38" r="1" />
+            <circle cx="22" cy="22" r="1.2" />
+            {/* Middle */}
+            <circle cx="30" cy="50" r="1.2" />
+            <circle cx="30" cy="34" r="1" />
+            <circle cx="32" cy="18" r="1.2" />
+            {/* Ring */}
+            <circle cx="38" cy="52" r="1.2" />
+            <circle cx="40" cy="38" r="1" />
+            <circle cx="44" cy="24" r="1.2" />
+            {/* Pinky */}
+            <circle cx="44" cy="56" r="1" />
+            <circle cx="50" cy="46" r="1" />
+            <circle cx="54" cy="36" r="1.2" />
+          </g>
+
+          {/* Palm center glow */}
+          <circle cx="30" cy="65" r="3" fill="rgba(74,143,228,0.1)" />
+          <circle cx="30" cy="65" r="1.5" fill="rgba(74,143,228,0.2)" />
+
+          {/* Expanding pulse ring */}
+          <circle cx="30" cy="65" r="3" stroke="rgba(74,143,228,0.3)" strokeWidth="1"
+            style={{ animation: 'pulseRing 3s ease-out infinite' }} />
+
+          {/* Scanning line */}
+          <rect x="4" y="0" width="54" height="1.5" rx="1" fill="rgba(74,143,228,0.15)"
+            className="prts-scan" />
+
+          {/* HUD corner brackets */}
+          <path d="M2,4 L2,14 M2,4 L12,4" stroke="rgba(74,143,228,0.12)" strokeWidth="0.6" />
+          <path d="M60,4 L60,14 M60,4 L50,4" stroke="rgba(74,143,228,0.12)" strokeWidth="0.6" />
+          <path d="M2,98 L2,88 M2,98 L12,98" stroke="rgba(74,143,228,0.12)" strokeWidth="0.6" />
+          <path d="M60,98 L60,88 M60,98 L50,98" stroke="rgba(74,143,228,0.12)" strokeWidth="0.6" />
+
+          {/* Tech readout dots */}
+          <circle cx="9" cy="2" r="0.5" fill="rgba(74,143,228,0.2)" />
+          <circle cx="53" cy="2" r="0.5" fill="rgba(74,143,228,0.2)" />
         </svg>
       </button>
+
+      {/* Floating hex particles */}
+      <div className="fixed pointer-events-none select-none" style={{ bottom: '15%', left: '10%', width: '10px', height: '10px' }}>
+        <svg viewBox="0 0 10 10" className="particle-1 w-full h-full" fill="none" stroke="rgba(74,143,228,0.15)" strokeWidth="0.6">
+          <polygon points="5,0.5 9.5,3 9.5,7 5,9.5 0.5,7 0.5,3" />
+        </svg>
+      </div>
+      <div className="fixed pointer-events-none select-none" style={{ bottom: '20%', right: '12%', width: '7px', height: '7px' }}>
+        <svg viewBox="0 0 10 10" className="particle-2 w-full h-full" fill="none" stroke="rgba(74,143,228,0.12)" strokeWidth="0.5">
+          <polygon points="5,0.5 9.5,3 9.5,7 5,9.5 0.5,7 0.5,3" />
+        </svg>
+      </div>
+      <div className="fixed pointer-events-none select-none" style={{ top: '25%', right: '15%', width: '6px', height: '6px' }}>
+        <svg viewBox="0 0 10 10" className="particle-3 w-full h-full" fill="none" stroke="rgba(74,143,228,0.1)" strokeWidth="0.5">
+          <polygon points="5,0.5 9.5,3 9.5,7 5,9.5 0.5,7 0.5,3" />
+        </svg>
+      </div>
+      <div className="fixed pointer-events-none select-none" style={{ top: '35%', left: '15%', width: '8px', height: '8px' }}>
+        <svg viewBox="0 0 10 10" className="particle-4 w-full h-full" fill="none" stroke="rgba(74,143,228,0.12)" strokeWidth="0.5">
+          <polygon points="5,0.5 9.5,3 9.5,7 5,9.5 0.5,7 0.5,3" />
+        </svg>
+      </div>
 
       {/* Priestess whisper toast — positioned dynamically relative to hand */}
       <AnimatePresence>

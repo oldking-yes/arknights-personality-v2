@@ -26,10 +26,11 @@
 - **纯前端 SPA** — React 19 + Vite 8，构建产物部署至 GitHub Pages，无需后端服务
 - **方舟玩家向内容** — 干员描述取材于游戏剧情、档案与名场面，拒绝 MBTI 式抽象标签
 - **雷达图可视化** — Chart.js 五维雷达图，直观对比你与干员的人格坐标
-- **Canvas 分享卡片** — 浏览器端生成分享海报，一键保存
-- **深度链接分享** — 通过 URL 参数编码分数，分享即直达结果
-- **Endfield 工业风 UI** — CRT 扫描线、蜂窝网格动效、暗色主题、PRTS 系统彩蛋
+- **Canvas 分享卡片** — 浏览器端生成分享海报，一键保存（JPEG 压缩优化，60–80% 体积缩减）
+- **深度链接分享** — 通过 URL 参数编码分数，分享即直达结果（支持 404 → SPA 回退）
+- **Endfield 工业风 UI** — PRTS 全息投影风格、旋转六边形环、星座线框手部动画、扫描线、暗色主题
 - **进度自动保存** — localStorage 持久化，意外关闭可续答
+- **反作弊选项洗牌** — 每题选项顺序随机打乱（Fisher-Yates），防止模式化猜答案
 
 ---
 
@@ -54,19 +55,19 @@
 ```
 src/
 ├── main.tsx                    # 入口
-├── App.tsx                     # 根组件：路由状态、进度管理、Debug 档案室
-├── index.css                   # Tailwind 主题 + 自定义组件样式
+├── App.tsx                     # 根组件：路由状态、进度管理、PRTS 终端、Debug 档案室
+├── index.css                   # Tailwind 主题令牌 + 40+ 自定义动画 & 组件样式
 ├── data/
-│   ├── types.ts                # TypeScript 类型定义
-│   ├── operators.ts            # 16 位干员数据（坐标/文案/标签）
-│   └── questions.ts            # 15 道测验题
+│   ├── types.ts                # TypeScript 类型定义（Operator / Question / Dimension）
+│   ├── operators.ts            # 16 位干员数据（五维坐标 / Persona / 灵魂叙事 / 标签）
+│   └── questions.ts            # 15 道战术情境测验题
 ├── utils/
 │   ├── matching.ts             # 欧几里得距离匹配算法
 │   └── storage.ts              # localStorage 进度持久化
 └── components/
-    ├── Intro.tsx               # 首页 / 品牌展示
-    ├── Quiz.tsx                # 答题页
-    ├── Results.tsx             # 结果页（英雄图/文案/雷达图/分享卡片）
+    ├── Intro.tsx               # 首页：PRTS 全息六边形 + 星座手部动画 + 普瑞塞斯低语彩蛋
+    ├── Quiz.tsx                # 答题页：选项洗牌、进度条、键盘快捷键
+    ├── Results.tsx             # 结果页：英雄立绘 / Persona 文案 / 雷达图 / Canvas 分享卡片
     └── RadarChart.tsx          # Chart.js 雷达图封装
 ```
 
@@ -102,35 +103,66 @@ npm run preview
 ## 🎨 产品亮点
 
 <details>
+<summary>🖼 PRTS 全息界面（首页）</summary>
+
+- **旋转六边形** — 三层同心六边形环以不同速度/方向旋转（40s CW / 25s CCW / 15s CW），顶点带光点标记
+- **星座手部动画** — 21 个关节点 + 22 条连接线的线框手部网格（类似 3D 骨骼追踪），带掌心脉冲环 + 水平扫描线动画
+- **HUD 角标** — 四角 L 形科技感装饰 + 数据读取点
+- **漂浮粒子** — 4 个飘浮六边形微粒，营造全息投影氛围
+- **普瑞塞斯低语** — 点击手部触发随机秘语信息，Toast 跟随手部按钮动态定位
+- **PRTS 终端** — 点击六边形打开覆盖层终端，显示系统启动日志 + 闪烁光标（支持 X 关闭）
+</details>
+
+<details>
 <summary>🖼 沉浸式结果页</summary>
 
-- 全屏英雄立绘背景，CSS 渐变遮罩
-- Persona 三段式人格速写 + 灵魂起源故事卡
-- 适配度百分比 + 五维雷达图
+- 全屏英雄立绘背景，CSS 渐变遮罩 + 图片加载失败自动回退到头像
+- Persona 三段式人格速写 + 灵魂起源故事卡（含干员一句话简介 desc）
+- 适配度百分比（灵魂共振 ≥ 80% / 深度匹配 ≥ 60% / 意外匹配） + 五维雷达图
 - 维度对比条（用户 vs 干员）
-- Canvas 生成分享卡片（保存/复制链接）
+- Canvas 生成分享卡片（JPEG 0.85，六边形背景合并为单路径绘制，性能优化 260×）
 </details>
 
 <details>
 <summary>🔗 深度链接分享</summary>
 
-URL 参数 `?s=5,9,6,5,7` 编码五维分数，分享后好友打开直接看到对应结果页，无需重新答题。
+URL 参数 `?s=5,9,6,5,7` 编码五维分数（或 `?c=op_name` 直接指定干员），分享后好友打开直接看到对应结果页，无需重新答题。
+
+**SPA 兼容**：`404.html` 将 GitHub Pages 的 404 请求回退到 `index.html`，确保深度链接在任何路径下正常工作。
 </details>
 
 <details>
 <summary>🕹 方舟玩家彩蛋</summary>
 
 - 底部系统状态栏（Mon3tr Standby / Babel Archive / Endfield Signal…）
-- 开发者控制台 PRTS / 普瑞塞斯主题信息
-- 全部干员档案室（DEBUG 入口）
+- 浏览器开发者控制台 PRTS / 普瑞塞斯主题信息（仅在首页触发）
+- 全部干员档案室（底部的 DEBUG 入口）
 - 干员详情页随机作战记录编号
+- 语音风格的灵魂低语（点击首页全息手部图案）
 </details>
 
 <details>
-<summary>♿ 键盘快捷键</summary>
+<summary>♿ 可访问性与反作弊</summary>
 
-答题时 `1`–`4` 选择答案，`Backspace` 返回上一题。
+- **键盘快捷键** — 答题时 `1`–`4` 选择答案，`Backspace` 返回上一题
+- **图片 alt 文本** — 所有干员图片使用 `alt={op.name}`，提升屏幕阅读器兼容性
+- **选项洗牌** — Fisher-Yates 算法每次进入新题随机打乱选项顺序，防止"选 A 最像/最强"的模式化猜测
+- **尊重动效偏好** — `prefers-reduced-motion` 媒体查询自动禁用动画
 </details>
+
+<details>
+<summary>⚡ 性能优化</summary>
+
+- **Canvas 绘制** — 分享卡片背景 26×20 = 520 个六边形合并为单条路径，减少 260 倍 draw call
+- **图片压缩** — 分享卡片输出格式从 PNG 改为 JPEG quality 0.85，文件体积减少 60–80%，深色背景无视觉差异
+- **本地资源优先** — 干员头像与立绘使用本地打包资源，减少外部 CDN 请求
+</details>
+
+---
+
+## 🧠 设计系统
+
+完整的颜色令牌、排版比例、组件规格、动画参数、间距系统记录在 [`DESIGN.md`](./DESIGN.md) 中。
 
 ---
 

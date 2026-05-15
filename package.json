@@ -1,7 +1,10 @@
 {
   "name": "arknights-personality-v2",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0",
+  "description": "罗德岛干员人格测试 — 15道战术情境题，5维人格图谱，匹配16位明日方舟干员",
+  "homepage": "https://oldking-yes.github.io/arknights-personality-v2/",
+  "keywords": ["arknights", "personality-test", "quiz", "react", "明日方舟", "人格测试"],
   "type": "module",
   "scripts": {
     "dev": "vite",
