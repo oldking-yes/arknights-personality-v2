@@ -1,12 +1,20 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import RadarChart from './RadarChart';
 import { DIM_LABELS } from '../data/types';
 import type { MatchResult } from '../utils/matching';
+import {
+  generateShareCard, generateCPCard, generateIdentityArchive,
+  buildShareUrl, buildChallengeUrl,
+} from '../utils/shareCards';
+import type { ShareFormat } from '../utils/shareCards';
 
 interface ResultsProps {
   result: MatchResult;
   onRestart: () => void;
+  onViewOp?: (opId: string) => void;
+  challengeCoords?: number[] | null;
 }
 
 const IMG = import.meta.env.BASE_URL + 'images/';
@@ -22,93 +30,14 @@ function charUrl(op: { portrait?: string; avatar: string }, fallback: boolean) {
     : IMG + 'skin/' + op.avatar.replace('#', '%23') + '_2b.png';
 }
 
-/** Draw a pentagon radar chart onto a canvas context */
-function drawRadar(
-  ctx: CanvasRenderingContext2D,
-  cx: number, cy: number, radius: number,
-  user: number[], opCoords: number[],
-  opColor: string, labels: string[],
-) {
-  const angles = labels.map((_, i) => (i * 72 - 90) * Math.PI / 180);
+const FORMAT_LABELS: { key: ShareFormat; label: string }[] = [
+  { key: 'wechat', label: '微信' },
+  { key: 'xiaohongshu', label: '小红书' },
+  { key: 'bilibili', label: 'B站' },
+];
 
-  // Grid rings
-  for (let ring = 1; ring <= 5; ring++) {
-    const r = (radius / 5) * ring;
-    ctx.beginPath();
-    angles.forEach((a, i) => {
-      const x = cx + r * Math.cos(a);
-      const y = cy + r * Math.sin(a);
-      i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-    });
-    ctx.closePath();
-    ctx.strokeStyle = `rgba(232,227,216,${0.04 + ring * 0.03})`;
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-  }
-
-  // Axes
-  angles.forEach(a => {
-    ctx.beginPath();
-    ctx.moveTo(cx, cy);
-    ctx.lineTo(cx + radius * Math.cos(a), cy + radius * Math.sin(a));
-    ctx.strokeStyle = 'rgba(232,227,216,0.08)';
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-  });
-
-  // Labels
-  ctx.textAlign = 'center';
-  ctx.fillStyle = '#8A8270';
-  ctx.font = '13px "Noto Sans SC", sans-serif';
-  angles.forEach((a, i) => {
-    const x = cx + (radius + 28) * Math.cos(a);
-    const y = cy + (radius + 28) * Math.sin(a);
-    ctx.fillText(labels[i], x, y + 4);
-  });
-
-  // User data polygon
-  ctx.beginPath();
-  angles.forEach((a, i) => {
-    const r = (user[i] / 10) * radius;
-    const x = cx + r * Math.cos(a);
-    const y = cy + r * Math.sin(a);
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  });
-  ctx.closePath();
-  ctx.fillStyle = 'rgba(232,227,216,0.15)';
-  ctx.fill();
-  ctx.strokeStyle = '#E8E3D8';
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-
-  // Operator data polygon
-  ctx.beginPath();
-  angles.forEach((a, i) => {
-    const r = (opCoords[i] / 10) * radius;
-    const x = cx + r * Math.cos(a);
-    const y = cy + r * Math.sin(a);
-    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-  });
-  ctx.closePath();
-  ctx.setLineDash([4, 4]);
-  ctx.strokeStyle = opColor;
-  ctx.lineWidth = 1.5;
-  ctx.stroke();
-  ctx.setLineDash([]);
-
-  // Data points on user polygon
-  angles.forEach((a, i) => {
-    const r = (user[i] / 10) * radius;
-    const x = cx + r * Math.cos(a);
-    const y = cy + r * Math.sin(a);
-    ctx.beginPath();
-    ctx.arc(x, y, 3, 0, Math.PI * 2);
-    ctx.fillStyle = '#E8E3D8';
-    ctx.fill();
-  });
-}
-
-export default function Results({ result, onRestart }: ResultsProps) {
+export default function Results({ result, onRestart, onViewOp, challengeCoords }: ResultsProps) {
+  const { t } = useTranslation();
   const { op, compatible, userCoords, ranking } = result;
   const [heroFallback, setHeroFallback] = useState(false);
   const [heroLoaded, setHeroLoaded] = useState(false);
@@ -116,6 +45,10 @@ export default function Results({ result, onRestart }: ResultsProps) {
   const [showShare, setShowShare] = useState(false);
   const [shareImg, setShareImg] = useState('');
   const [shareLoading, setShareLoading] = useState(false);
+  const [shareFormat, setShareFormat] = useState<ShareFormat>('wechat');
+  const [cpImg, setCpImg] = useState('');
+  const [archiveImg, setArchiveImg] = useState('');
+  const [showChallenge, setShowChallenge] = useState(false);
 
   const items = DIM_LABELS.map((label, i) => ({
     label, user: userCoords[i], op: op.coords[i]
@@ -123,182 +56,46 @@ export default function Results({ result, onRestart }: ResultsProps) {
 
   const top3 = ranking.slice(0, 3);
 
-  const shareUrl = `${window.location.origin}/arknights-personality-v2/?c=${userCoords.join(',')}`;
+  const shareUrl = buildShareUrl(userCoords);
+  const challengeUrl = buildChallengeUrl(userCoords);
 
-  const shareIntro = compatible >= 80 ? '灵魂共振' : compatible >= 60 ? '深度匹配' : '意外匹配';
+  const shareIntro = compatible >= 80 ? t('results.compatLevel.soul') : compatible >= 60 ? t('results.compatLevel.deep') : t('results.compatLevel.surprise');
   const shareText = `🔮 罗德岛人格测试 · ${shareIntro}\n我与「${op.name}」的适配度高达 ${compatible}%\n「${op.title}」\n\n来测测看你会匹配到哪位干员 → ${shareUrl}`;
 
   const isWechat = /MicroMessenger/i.test(navigator.userAgent);
 
-  const generateShareCard = useCallback(async () => {
+  // Challenge link detection
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('challenge') === '1') setShowChallenge(true);
+  }, []);
+
+  const doGenerate = useCallback(async (fmt: ShareFormat) => {
     if (shareLoading) return;
     setShareLoading(true);
-
-    const W = 800, H = 1300;
-    const canvas = document.createElement('canvas');
-    canvas.width = W;
-    canvas.height = H;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) { setShareLoading(false); return; }
-
-    // Background
-    ctx.fillStyle = '#0D0F11';
-    ctx.fillRect(0, 0, W, H);
-
-    // Hex pattern bg — single path for all hexagons (520 → 1 draw call)
-    ctx.beginPath();
-    for (let r = 0; r < 26; r++) {
-      for (let c = 0; c < 20; c++) {
-        const cx = c * 48 + (r % 2) * 24, cy = r * 40;
-        for (let i = 0; i < 6; i++) {
-          const a = (i * 60 - 30) * Math.PI / 180;
-          const x = cx + 20 * Math.cos(a), y = cy + 20 * Math.sin(a);
-          i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
-        }
-        ctx.closePath();
-      }
-    }
-    ctx.strokeStyle = 'rgba(232,227,216,0.03)';
-    ctx.lineWidth = 0.5;
-    ctx.stroke();
-
-    // Radial glow
-    const grad = ctx.createRadialGradient(400, 160, 20, 400, 160, 380);
-    grad.addColorStop(0, op.color + '30');
-    grad.addColorStop(1, 'transparent');
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, W, 450);
-
-    // Try loading avatar for card
-    const avatarImg = await new Promise<HTMLImageElement | null>(resolve => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.onload = () => resolve(img);
-      img.onerror = () => resolve(null);
-      img.src = IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png';
-    });
-
-    // Avatar circle
-    if (avatarImg) {
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(400, 80, 48, 0, Math.PI * 2);
-      ctx.closePath();
-      ctx.clip();
-      ctx.drawImage(avatarImg, 352, 32, 96, 96);
-      ctx.restore();
-    }
-
-    ctx.textAlign = 'center';
-    ctx.fillStyle = '#8A8270';
-    ctx.font = '18px "Cormorant Garamond", serif';
-    ctx.fillText('与你灵魂共振的干员', 400, avatarImg ? 165 : 90);
-
-    ctx.fillStyle = '#E8E3D8';
-    ctx.font = 'bold 64px "Cormorant Garamond", serif';
-    ctx.fillText(op.name, 400, avatarImg ? 250 : 180);
-
-    ctx.fillStyle = '#B8B0A0';
-    ctx.font = '20px "Noto Sans SC", sans-serif';
-    ctx.fillText(op.title, 400, avatarImg ? 290 : 220);
-
-    // Radar chart area
-    const radarCX = 400, radarCY = 460, radarR = 170;
-    drawRadar(ctx, radarCX, radarCY, radarR, userCoords, op.coords, op.color, DIM_LABELS);
-
-    // Legend
-    ctx.font = '14px "Cormorant Garamond", serif';
-    ctx.fillStyle = '#E8E3D8';
-    ctx.fillRect(260, 600, 14, 14);
-    ctx.fillText('你的坐标', 284, 612);
-    ctx.strokeStyle = op.color;
-    ctx.setLineDash([4, 4]);
-    ctx.strokeRect(440, 600, 14, 14);
-    ctx.setLineDash([]);
-    ctx.fillStyle = op.color;
-    ctx.fillText(op.name, 464, 612);
-
-    // Compatibility
-    ctx.fillStyle = '#E8E3D8';
-    ctx.font = 'bold 48px "Cormorant Garamond", serif';
-    ctx.fillText(`${compatible}%`, 400, 678);
-    ctx.fillStyle = '#8A8270';
-    ctx.font = '16px "Cormorant Garamond", serif';
-    ctx.fillText('适配度', 400, 705);
-
-    // Persona excerpt
-    ctx.fillStyle = '#B8B0A0';
-    ctx.font = '16px "Noto Sans SC", sans-serif';
-    let ty = 760;
-    op.persona.slice(0, 2).forEach(t => {
-      let line = '', ly = ty;
-      for (const ch of t) {
-        const testLine = line + ch;
-        if (ctx.measureText(testLine).width > 520) {
-          ctx.fillText(line, 400, ly);
-          line = ch;
-          ly += 26;
-        } else line = testLine;
-      }
-      if (line) ctx.fillText(line, 400, ly);
-      ty = ly + 36;
-    });
-
-    // Tags
-    ty += 16;
-    op.tags.slice(0, 4).forEach((tag, i) => {
-      const x = 150 + i * 140;
-      ctx.strokeStyle = 'rgba(232,227,216,0.2)';
-      ctx.lineWidth = 0.5;
-      const tw = ctx.measureText(tag).width + 24;
-      ctx.strokeRect(x - tw / 2, ty - 10, tw, 28);
-      ctx.fillStyle = '#8A8270';
-      ctx.font = '14px "Cormorant Garamond", serif';
-      ctx.fillText(tag, x, ty + 7);
-    });
-
-    // Top 3 section
-    ty += 60;
-    ctx.fillStyle = '#6A6050';
-    ctx.font = '14px "Cormorant Garamond", serif';
-    ctx.fillText('— 其他匹配 —', 400, ty);
-    ty += 30;
-    ranking.slice(1, 4).forEach((m, i) => {
-      ctx.fillStyle = '#8A8270';
-      ctx.font = '17px "Cormorant Garamond", serif';
-      ctx.fillText(`#${i + 2} ${m.op.name} · ${m.compatible}%`, 400, ty);
-      ty += 28;
-    });
-
-    // Footer
-    ctx.fillStyle = '#5A5040';
-    ctx.font = '13px "Cormorant Garamond", serif';
-    ctx.fillText('罗德岛干员人格测试 · R.I. Personality Quiz', 400, H - 60);
-    ctx.font = '11px "Cormorant Garamond", serif';
-    ctx.fillText(shareUrl, 400, H - 38);
-
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
-    setShareImg(dataUrl);
-    setShowShare(true);
+    setShareFormat(fmt);
+    try {
+      const img = await generateShareCard({
+        format: fmt, op, compatible, userCoords, ranking, shareUrl,
+      });
+      setShareImg(img);
+      setShowShare(true);
+    } catch { /* silently fail */ }
     setShareLoading(false);
-  }, [op, compatible, userCoords, ranking, shareLoading, shareUrl]);
+  }, [op, compatible, userCoords, ranking, shareUrl, shareLoading]);
 
   const downloadShareCard = useCallback(() => {
     if (!shareImg) return;
     const a = document.createElement('a');
-    a.download = `arknights-${op.id}.png`;
+    a.download = `arknights-${op.id}-${shareFormat}.jpg`;
     a.href = shareImg;
     a.click();
-  }, [shareImg, op.id]);
+  }, [shareImg, op.id, shareFormat]);
 
   const handleWebShare = useCallback(async () => {
     if (navigator.share) {
-      try {
-        await navigator.share({ title: '罗德岛干员人格测试', text: shareText, url: shareUrl });
-        return;
-      } catch {}
+      try { await navigator.share({ title: '罗德岛干员人格测试', text: shareText, url: shareUrl }); return; } catch {}
     }
-    // Fallback: copy link
     try {
       await navigator.clipboard.writeText(shareText + '\n' + shareUrl);
       alert('分享链接已复制！' + (isWechat ? '\n请点击右上角 ··· 发送给朋友。' : ''));
@@ -310,6 +107,56 @@ export default function Results({ result, onRestart }: ResultsProps) {
   const copyShareText = useCallback(() => {
     navigator.clipboard.writeText(shareText + '\n' + shareUrl);
   }, [shareText, shareUrl]);
+
+  const copyChallengeLink = useCallback(() => {
+    navigator.clipboard.writeText(
+      `⚔️ 我测出来是「${op.name}」(${compatible}%)，猜猜你会是谁？\n${challengeUrl}`
+    );
+  }, [op.name, compatible, challengeUrl]);
+
+  const handleCPCard = useCallback(async () => {
+    if (shareLoading) return;
+    setShareLoading(true);
+    try {
+      // Use second match from ranking for demo CP pairing
+      const op2 = ranking[1]?.op || ranking[0].op;
+      const coords1 = userCoords;
+      const coords2 = op2.coords;
+      // Euclidean distance → compatibility
+      const dist = Math.sqrt(coords1.reduce((sum, c, i) => sum + (c - coords2[i]) ** 2, 0));
+      const maxDist = Math.sqrt(500);
+      const compat = Math.max(0, Math.round((1 - dist / maxDist) * 100));
+      const img = await generateCPCard(op, coords1, op2, coords2, compat);
+      setCpImg(img);
+    } catch {}
+    setShareLoading(false);
+  }, [shareLoading, op, userCoords, ranking]);
+
+  const handleIdentityArchive = useCallback(async () => {
+    if (shareLoading) return;
+    setShareLoading(true);
+    try {
+      const img = await generateIdentityArchive(op, userCoords, compatible);
+      setArchiveImg(img);
+    } catch {}
+    setShareLoading(false);
+  }, [shareLoading, op, userCoords, compatible]);
+
+  const downloadArchive = useCallback(() => {
+    if (!archiveImg) return;
+    const a = document.createElement('a');
+    a.download = `R.I.-${op.id}-archive.jpg`;
+    a.href = archiveImg;
+    a.click();
+  }, [archiveImg, op.id]);
+
+  const downloadCP = useCallback(() => {
+    if (!cpImg) return;
+    const a = document.createElement('a');
+    a.download = `arknights-cp-${op.id}.jpg`;
+    a.href = cpImg;
+    a.click();
+  }, [cpImg, op.id]);
 
   return (
     <>
@@ -347,7 +194,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
               className="flex flex-col items-center"
             >
               <div className="font-serif-en italic text-sm tracking-[0.15em] text-warm-dim mb-3">
-                与你灵魂共振的干员
+                {t('results.subtitle')}
               </div>
               <h2 className="font-serif-en text-6xl font-normal tracking-[0.08em] text-white mb-2">
                 {op.name}
@@ -367,17 +214,28 @@ export default function Results({ result, onRestart }: ResultsProps) {
           </div>
         </div>
 
+        {/* Challenge banner */}
+        {showChallenge && challengeCoords && (
+          <motion.div initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="w-full max-w-md px-6 mb-6">
+            <div className="p-4 border border-lemon/20 bg-lemon-dim text-center">
+              <p className="font-serif-cn text-sm text-lemon">
+                你被朋友挑战了！下方可查看你们的兼容度。
+              </p>
+            </div>
+          </motion.div>
+        )}
+
         {/* Main content */}
         <div className="w-full max-w-md px-6">
           {/* Persona */}
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
-            <div className="section-label">Persona</div>
-            {op.persona.map((t, i) => (
-              <p key={i} className="persona-text">{t}</p>
+            <div className="section-label">{t('results.personaLabel')}</div>
+            {op.persona.map((text, i) => (
+              <p key={i} className="persona-text">{text}</p>
             ))}
             <div className="flex flex-wrap gap-2 justify-center mt-6">
-              {op.tags.map((t, i) => (
-                <span key={i} className="tag">{t}</span>
+              {op.tags.map((tag, i) => (
+                <span key={i} className="tag">{tag}</span>
               ))}
             </div>
           </motion.div>
@@ -397,18 +255,18 @@ export default function Results({ result, onRestart }: ResultsProps) {
           {/* Soul */}
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.6 }}>
             <div className="soul-card">
-              <div className="soul-label">灵魂起源</div>
+              <div className="soul-label">{t('results.soulLabel')}</div>
               <div className="soul-name">{op.name}</div>
               <div className="soul-name-cn">{op.title}</div>
-              {op.soul.map((t, i) => (
-                <p key={i} className="soul-text" dangerouslySetInnerHTML={{ __html: t }} />
+              {op.soul.map((text, i) => (
+                <p key={i} className="soul-text" dangerouslySetInnerHTML={{ __html: text }} />
               ))}
             </div>
           </motion.div>
 
           {/* Compatibility + Radar */}
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.7 }} className="mt-8">
-            <div className="section-label">适配度</div>
+            <div className="section-label">{t('results.compatibility')}</div>
             <div className="text-center mb-6">
               <span className="font-serif-en text-5xl text-white">{compatible}</span>
               <span className="font-serif-en text-lg text-warm-dim">%</span>
@@ -421,7 +279,7 @@ export default function Results({ result, onRestart }: ResultsProps) {
 
           {/* Dimension bars */}
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.9 }} className="mt-6">
-            <div className="section-label">维度</div>
+            <div className="section-label">{t('results.dimensionLabel')}</div>
             <div className="flex flex-col gap-3">
               {items.map((item, i) => (
                 <div key={i}>
@@ -445,20 +303,26 @@ export default function Results({ result, onRestart }: ResultsProps) {
 
           {/* Top 3 matches */}
           <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.95 }}>
-            <div className="section-label">其他匹配</div>
+            <div className="section-label">{t('results.topMatches')}</div>
             <div className="flex flex-col gap-2 mb-6">
-              {top3.map((m, i) => (
+              {top3.map((m) => (
                 <div key={m.op.id}
-                  className="match-card flex items-center gap-3 p-3 bg-white/5 border border-white/10 cursor-default">
-                  <span className="font-serif-en text-lg text-warm-dim min-w-[1.5rem] text-center">
-                    {i === 0 ? '◆' : `#${i + 1}`}
-                  </span>
-                  <span className="font-serif-en text-sm text-white min-w-0 truncate">
-                    {m.op.name}
-                  </span>
-                  <span className="font-mono text-[0.55rem] text-warm-dim ml-auto shrink-0">
-                    {m.compatible}%
-                  </span>
+                  className="match-card flex items-center gap-3 p-3 bg-white/5 border border-white/10 cursor-pointer"
+                  onClick={() => onViewOp?.(m.op.id)}
+                >
+                  <img
+                    src={IMG + 'avatar/' + m.op.avatar.replace('#', '%23') + '.png'}
+                    alt={m.op.name}
+                    className="w-10 h-10 rounded-full object-cover"
+                  />
+                  <div className="flex flex-col min-w-0">
+                    <span className="font-serif-en text-sm text-white">{m.op.name}</span>
+                    <span className="font-serif-cn text-[0.6rem] text-warm-dim" style={{ color: m.op.color }}>{m.op.title}</span>
+                  </div>
+                  <div className="ml-auto flex flex-col items-center shrink-0">
+                    <span className="font-serif-en text-lg text-white">{m.compatible}</span>
+                    <span className="font-mono text-[0.45rem] text-warm-dim">%</span>
+                  </div>
                 </div>
               ))}
             </div>
@@ -471,36 +335,59 @@ export default function Results({ result, onRestart }: ResultsProps) {
             transition={{ delay: 1.0 }}
             className="flex flex-col items-center gap-3 pb-6"
           >
+            {/* Format switcher + generate */}
+            <div className="flex gap-1 mb-1">
+              {FORMAT_LABELS.map(f => (
+                <button key={f.key}
+                  onClick={() => doGenerate(f.key)}
+                  disabled={shareLoading}
+                  className="px-3 py-1 font-mono text-[0.5rem] tracking-wider text-warm-dim border border-white/10 hover:border-lemon/30 hover:text-lemon transition-colors disabled:opacity-40"
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
             <button
-              onClick={generateShareCard}
+              onClick={() => doGenerate('wechat')}
               disabled={shareLoading}
               className="inline-block px-10 py-3 bg-white text-deep-900 font-serif-cn text-sm tracking-[0.25em] cursor-pointer transition-all duration-300 hover:bg-warm-white active:scale-[0.97] disabled:opacity-50"
             >
-              {shareLoading ? '生成中...' : '生成分享卡片'}
+              {shareLoading ? '生成中...' : t('results.actions.shareCard')}
             </button>
             <button
               onClick={handleWebShare}
               className="inline-block px-10 py-3 bg-transparent text-warm-muted border border-white/20 font-serif-cn text-sm tracking-[0.25em] cursor-pointer transition-all duration-300 hover:text-warm-white hover:border-white/40 active:scale-[0.97]"
             >
-              {isWechat ? '微信分享 · 点击复制' : '分享给好友'}
+              {isWechat ? t('results.wechat.share') : t('results.actions.share')}
             </button>
+
+            <button onClick={handleCPCard} disabled={shareLoading}
+                className="bg-transparent text-warm-dim font-serif-cn text-xs tracking-[0.15em] cursor-pointer border border-white/10 px-3 py-1.5 transition-all duration-200 hover:text-warm-muted hover:border-white/30 disabled:opacity-40">
+                {t('results.actions.cpCard')}
+              </button>
+            <div className="flex gap-3 mt-2">
+              <button onClick={handleIdentityArchive} disabled={shareLoading}
+                className="bg-transparent text-warm-dim font-serif-cn text-xs tracking-[0.15em] cursor-pointer border border-white/10 px-3 py-1.5 transition-all duration-200 hover:text-warm-muted hover:border-white/30 disabled:opacity-40">
+                {t('results.actions.identityArchive')}
+              </button>
+              <button onClick={copyChallengeLink}
+                className="bg-transparent text-warm-dim font-serif-cn text-xs tracking-[0.15em] cursor-pointer border border-white/10 px-3 py-1.5 transition-all duration-200 hover:text-warm-muted hover:border-white/30">
+                {t('results.actions.challenge')}
+              </button>
+            </div>
+
             <button
               onClick={onRestart}
-              className="bg-transparent text-warm-dim font-serif-cn text-xs tracking-[0.2em] cursor-pointer border-b border-dotted border-warm-dim/40 pb-0.5 transition-all duration-200 hover:text-warm-muted hover:border-warm-muted"
+              className="bg-transparent text-warm-dim font-serif-cn text-xs tracking-[0.2em] cursor-pointer border-b border-dotted border-warm-dim/40 pb-0.5 transition-all duration-200 hover:text-warm-muted hover:border-warm-muted mt-2"
             >
-              重新测试
+              {t('results.actions.restart')}
             </button>
           </motion.div>
 
-          {/* WeChat hint */}
           {isWechat && (
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.2 }}
-              className="font-serif-cn text-xs text-warm-dim text-center mb-8"
-            >
-              💡 点击「分享给好友」复制链接，然后点击右上角 <strong className="text-warm-muted">···</strong> 发送给朋友
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}
+              className="font-serif-cn text-xs text-warm-dim text-center mb-8">
+              💡 {t('results.wechat.hint')}
             </motion.p>
           )}
         </div>
@@ -508,41 +395,76 @@ export default function Results({ result, onRestart }: ResultsProps) {
 
       {/* Share Modal */}
       {showShare && (
-        <div
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6"
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6"
           style={{ background: 'rgba(13,15,17,0.95)' }}
           onClick={() => setShowShare(false)}
         >
-          <button
-            className="absolute top-5 right-6 text-warm-white text-3xl font-serif-en cursor-pointer z-10"
-            onClick={() => setShowShare(false)}
-          >
-            &times;
-          </button>
+          <button className="absolute top-5 right-6 text-warm-white text-3xl font-serif-en cursor-pointer z-10"
+            onClick={() => setShowShare(false)}>&times;</button>
           {shareImg && (
             <>
-              <img src={shareImg} alt="分享卡片" className="max-w-[90%] max-h-[70vh] rounded shadow-2xl" />
-              <div className="mt-6 flex gap-3">
-                <button
-                  onClick={downloadShareCard}
-                  className="px-8 py-3 bg-white text-deep-900 font-serif-cn text-sm tracking-[0.2em] cursor-pointer transition-all duration-300 hover:bg-warm-white"
-                >
-                  保存图片
+              <img src={shareImg} alt={t('results.shareModal')} className="max-w-[90%] max-h-[65vh] rounded shadow-2xl" />
+              <div className="flex gap-1 mt-3">
+                {FORMAT_LABELS.map(f => (
+                  <button key={f.key}
+                    onClick={() => doGenerate(f.key)}
+                    className={`px-3 py-1 font-mono text-[0.5rem] tracking-wider transition-colors ${
+                      shareFormat === f.key ? 'text-lemon border border-lemon/40' : 'text-warm-dim border border-white/10 hover:text-warm-muted'
+                    }`}
+                  >{f.label}</button>
+                ))}
+              </div>
+              <div className="mt-4 flex gap-3">
+                <button onClick={downloadShareCard}
+                  className="px-8 py-3 bg-white text-deep-900 font-serif-cn text-sm tracking-[0.2em] cursor-pointer transition-all duration-300 hover:bg-warm-white">
+                  {t('results.actions.download')}
                 </button>
-                <button
-                  onClick={copyShareText}
-                  className="px-8 py-3 bg-transparent text-warm-muted border border-white/20 font-serif-cn text-sm tracking-[0.2em] cursor-pointer transition-all duration-300 hover:text-warm-white hover:border-white/40"
-                >
-                  复制分享文案
+                <button onClick={copyShareText}
+                  className="px-8 py-3 bg-transparent text-warm-muted border border-white/20 font-serif-cn text-sm tracking-[0.2em] cursor-pointer transition-all duration-300 hover:text-warm-white hover:border-white/40">
+                  {t('results.actions.copyText')}
                 </button>
               </div>
               {isWechat && (
-                <p className="mt-4 font-serif-cn text-xs text-warm-dim text-center">
-                  长按图片保存，或点击右上角 <strong className="text-warm-muted">···</strong> 分享给朋友
-                </p>
+                <p className="mt-4 font-serif-cn text-xs text-warm-dim text-center">{t('results.wechat.modalHint')}</p>
               )}
             </>
           )}
+        </div>
+      )}
+
+      {/* Identity Archive Modal */}
+      {archiveImg && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6"
+          style={{ background: 'rgba(13,15,17,0.95)' }}
+          onClick={() => setArchiveImg('')}
+        >
+          <button className="absolute top-5 right-6 text-warm-white text-3xl font-serif-en cursor-pointer z-10"
+            onClick={() => setArchiveImg('')}>&times;</button>
+          <img src={archiveImg} alt="身份档案" className="max-w-[90%] max-h-[75vh] rounded shadow-2xl" />
+          <div className="mt-4">
+            <button onClick={downloadArchive}
+              className="px-8 py-3 bg-white text-deep-900 font-serif-cn text-sm tracking-[0.2em] cursor-pointer transition-all duration-300 hover:bg-warm-white">
+              {t('results.actions.download')}
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* CP Card Modal */}
+      {cpImg && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-6"
+          style={{ background: 'rgba(13,15,17,0.95)' }}
+          onClick={() => setCpImg('')}
+        >
+          <button className="absolute top-5 right-6 text-warm-white text-3xl font-serif-en cursor-pointer z-10"
+            onClick={() => setCpImg('')}>&times;</button>
+          <img src={cpImg} alt="CP卡片" className="max-w-[90%] max-h-[75vh] rounded shadow-2xl" />
+          <div className="mt-4">
+            <button onClick={downloadCP}
+              className="px-8 py-3 bg-white text-deep-900 font-serif-cn text-sm tracking-[0.2em] cursor-pointer transition-all duration-300 hover:bg-warm-white">
+              {t('results.actions.download')}
+            </button>
+          </div>
         </div>
       )}
     </>

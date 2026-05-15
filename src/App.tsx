@@ -1,14 +1,30 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Intro from './components/Intro';
-import Quiz from './components/Quiz';
-import Results from './components/Results';
+import ErrorBoundary from './components/ErrorBoundary';
 import RadarChart from './components/RadarChart';
 import { QUESTIONS } from './data/questions';
 import { findBestMatch, findMatchFromCoords } from './utils/matching';
 import { saveProgress, loadProgress, clearProgress } from './utils/storage';
 import type { Stage, AnswerRecord, Operator } from './data/types';
 import { OPERATORS } from './data/operators';
+
+const Quiz = lazy(() => import('./components/Quiz'));
+const Results = lazy(() => import('./components/Results'));
+
+const LoadingSkeleton = () => (
+  <div className="flex flex-col items-center justify-center min-h-screen px-6 gap-6"
+    style={{ background: '#0D0F11' }}>
+    <div className="skeleton w-48 h-4" />
+    <div className="skeleton w-72 h-10" />
+    <div className="skeleton w-64 h-4" />
+    <div className="flex flex-col gap-3 w-full max-w-sm mt-8">
+      {[...Array(4)].map((_, i) => (
+        <div key={i} className="skeleton w-full h-14" />
+      ))}
+    </div>
+  </div>
+);
 
 const TOTAL = QUESTIONS.length;
 
@@ -23,6 +39,8 @@ export default function App() {
   const [sysIdx, setSysIdx] = useState(0);
   const keyBuf = useRef('');
   const [prtsActive, setPrtsActive] = useState(false);
+  const [challengeCoords, setChallengeCoords] = useState<number[] | null>(null);
+  const [debugOp, setDebugOp] = useState<Operator | null>(null);
 
   const SYS_MSGS = [
     'SYS: ACTIVE','SYS: MON3TR STANDBY','SYS: ORIGINIUM SAT 0.02%',
@@ -63,17 +81,26 @@ export default function App() {
     }
   }, []);
 
-  // Deep linking: ?c=5,9,6,5,7
+  // Deep linking: ?c=5,9,6,5,7&challenge=1&u2=3,5,7,4,6
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const coordsStr = params.get('c');
+    const u2Str = params.get('u2');
+    const challenge = params.get('challenge');
     if (coordsStr) {
       const coords = coordsStr.split(',').map(Number);
       if (coords.length === 5 && coords.every(n => !isNaN(n) && n >= 0 && n <= 10)) {
         const r = findMatchFromCoords(coords);
         setResult(r);
         setStage('results');
-        // Clean URL without reload
+        if (challenge === '1' && u2Str) {
+          const u2 = u2Str.split(',').map(Number);
+          if (u2.length === 5 && u2.every(n => !isNaN(n) && n >= 0 && n <= 10)) {
+            setChallengeCoords(u2);
+          } else {
+            setChallengeCoords(coords);
+          }
+        }
         window.history.replaceState({}, '', window.location.pathname);
       }
     }
@@ -185,14 +212,27 @@ export default function App() {
         }
       `}</style>
 
-      <div className="relative z-10 w-full max-w-lg mx-auto">
-        <AnimatePresence mode="wait">
-          {stage==='intro' && <Intro key="intro" onStart={startQuiz} onRandom={randomQuiz} onShowAll={showAll} onPrtsToggle={() => setPrtsActive(a => !a)} />}
-          {stage==='quiz' && currentQ < TOTAL && <Quiz key="quiz" currentQ={currentQ} onAnswer={handleAnswer} onPrev={handlePrev} />}
-          {stage==='results' && result && <Results key="results" result={result} onRestart={restart} />}
-          {stage==='debug' && <DebugView key="debug" onBack={restart} />}
-        </AnimatePresence>
-      </div>
+      <ErrorBoundary>
+        <div className="relative z-10 w-full max-w-lg mx-auto">
+          <AnimatePresence mode="wait">
+            {stage==='intro' && <Intro key="intro" onStart={startQuiz} onRandom={randomQuiz} onShowAll={showAll} onPrtsToggle={() => setPrtsActive(a => !a)} />}
+            {stage==='quiz' && currentQ < TOTAL && (
+              <Suspense fallback={<LoadingSkeleton />}>
+                <Quiz key="quiz" currentQ={currentQ} onAnswer={handleAnswer} onPrev={handlePrev} />
+              </Suspense>
+            )}
+            {stage==='results' && result && (
+              <Suspense fallback={<LoadingSkeleton />}>
+                <Results key="results" result={result} onRestart={restart}
+                  onViewOp={(opId) => { setDebugOp(OPERATORS.find(o => o.id === opId) || null); setStage('debug'); }}
+                  challengeCoords={challengeCoords}
+                />
+              </Suspense>
+            )}
+            {stage==='debug' && <DebugView key="debug" onBack={restart} initialOp={debugOp} onCloseOp={() => setDebugOp(null)} />}
+          </AnimatePresence>
+        </div>
+      </ErrorBoundary>
 
       {/* System footer */}
       <div className="fixed bottom-0 left-0 right-0 z-20 px-4 py-1.5 flex justify-between font-mono text-[9px] tracking-widest text-warm-dim/40 pointer-events-none select-none"
@@ -202,7 +242,7 @@ export default function App() {
         <span>{stage === 'intro' ? 'IDLE' : stage === 'quiz' ? `Q${currentQ + 1}/${TOTAL}` : stage === 'debug' ? 'ARCHIVE' : 'RESULT'}</span>
         <span className="flex items-center gap-1" onClick={() => setSysIdx(i => (i + 7) % SYS_MSGS.length)}>
           <span className="w-1.5 h-1.5 rounded-full bg-lemon animate-pulse" />
-          R.I. v2.0
+          R.I. v3.0
         </span>
       </div>
 
@@ -253,8 +293,8 @@ export default function App() {
   );
 }
 
-function DebugView({ onBack }: { onBack: () => void }) {
-  const [selected, setSelected] = useState<Operator | null>(null);
+function DebugView({ onBack, initialOp, onCloseOp }: { onBack: () => void; initialOp?: Operator | null; onCloseOp?: () => void }) {
+  const [selected, setSelected] = useState<Operator | null>(initialOp || null);
   const cdn = import.meta.env.BASE_URL + 'images/avatar/';
   const ARCHIVE_MSGS = [
     '档案室 · 已解锁干员 16/16',
@@ -275,7 +315,7 @@ function DebugView({ onBack }: { onBack: () => void }) {
   const [archiveMsg] = useState(() => ARCHIVE_MSGS[Math.floor(Math.random() * ARCHIVE_MSGS.length)]);
 
   if (selected) {
-    return <OperatorDetail op={selected} onBack={() => setSelected(null)} />;
+    return <OperatorDetail op={selected} onBack={() => { setSelected(null); onCloseOp?.(); }} />;
   }
 
   return (

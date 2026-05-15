@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useTranslation } from 'react-i18next';
 import { QUESTIONS } from '../data/questions';
 import type { Question } from '../data/types';
 
@@ -21,6 +22,7 @@ function shuffle<T>(arr: T[]): T[] {
 }
 
 export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
+  const { t } = useTranslation();
   const question: Question = QUESTIONS[currentQ];
   const progress = ((currentQ + 1) / QUESTIONS.length) * 100;
 
@@ -48,7 +50,7 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
       <div className="w-full max-w-md">
         {/* header: section + progress */}
         <div className="flex justify-between items-center mb-2">
-          <span className="font-serif-en italic text-xs tracking-[0.15em] text-warm-dim">TACTICAL ASSESSMENT</span>
+          <span className="font-serif-en italic text-xs tracking-[0.15em] text-warm-dim">{t('quiz.header')}</span>
           <span className="font-serif-en text-xs tracking-[0.1em] text-warm-muted">
             {String(currentQ + 1).padStart(2, '0')} / {String(QUESTIONS.length).padStart(2, '0')}
           </span>
@@ -108,11 +110,11 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
               onClick={onPrev}
               className="px-4 py-2 bg-transparent border border-white/10 text-warm-dim font-serif-cn text-xs tracking-[0.2em] cursor-pointer transition-all duration-200 hover:bg-white/[0.05] hover:text-warm-muted hover:border-white/20"
             >
-              ← 上一题
+              ← {t('quiz.hint').includes('RETURN') ? '上一题' : 'Back'}
             </button>
           ) : <div />}
           <span className="font-mono text-[0.5rem] tracking-[0.2em] text-warm-dim/40">
-            [1–4] SELECT · [BKSP] RETURN
+            {t('quiz.hint')}
           </span>
         </div>
       </div>

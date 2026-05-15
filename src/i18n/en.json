@@ -1,0 +1,76 @@
+{
+  "intro": {
+    "subtitle": "— a personality map of Rhodes Island —",
+    "title": "R.I.",
+    "heading": "R.I. Operator Personality Quiz",
+    "desc1": "Choices made on the battlefield mirror the shape of your soul.",
+    "desc2": "15 tactical scenarios to <0>find the operator whose frequency resonates with yours.</0>",
+    "meta": "16 operators · 15 questions · 3 min",
+    "start": "BEGIN TEST",
+    "tip": "Best taken in a quiet moment",
+    "random": "⚡ Skip to Result",
+    "debug": "DEBUG · All Operators"
+  },
+  "quiz": {
+    "header": "TACTICAL ASSESSMENT",
+    "progress": "Q{current}/{total}",
+    "hint": "[1–4] SELECT · [BKSP] BACK"
+  },
+  "results": {
+    "subtitle": "Your Resonant Operator",
+    "compatibility": "Compatibility",
+    "soulLabel": "Origin Story",
+    "personaLabel": "Persona",
+    "tags": "Traits",
+    "dimensionLabel": "Dimension Comparison",
+    "matchRanking": "Your Match Ranking",
+    "topMatches": "Your Top 3 Matches",
+    "actions": {
+      "shareCard": "Generate Share Card",
+      "share": "Share with Friend",
+      "restart": "Retake Test",
+      "download": "Save Image",
+      "copyLink": "Copy Link",
+      "copyText": "Copy Text",
+      "challenge": "Challenge a Friend",
+      "identityArchive": "Generate Archive",
+      "cpCard": "Generate CP Card"
+    },
+    "wechat": {
+      "share": "Share via WeChat · Copy Link",
+      "hint": "Copy the link and paste it into WeChat to share",
+      "modalHint": "Long-press to save, or tap ··· in the top right to share"
+    },
+    "compatLevel": {
+      "soul": "Soul Resonance",
+      "deep": "Deep Match",
+      "surprise": "Surprising Match"
+    },
+    "shareModal": "Share Card",
+    "switchFormat": "Change Format"
+  },
+  "compare": {
+    "title": "R.I. Personality Compatibility",
+    "compatPercent": "Compatibility",
+    "cpText_high": "Your frequencies hum on the same wavelength.",
+    "cpText_mid": "Your battlefield styles are worlds apart — yet perfectly complementary.",
+    "cpText_low": "Your frequencies are distant, but that may be its own kind of gravity.",
+    "challengeHint": "I matched with {op}. Who will you get?"
+  },
+  "identityArchive": {
+    "title": "R.I. Personnel Archive",
+    "fileNo": "File No.",
+    "assessment": "Personnel Assessment"
+  },
+  "footer": {
+    "idle": "IDLE",
+    "quiz": "Q{current}/{total}",
+    "archive": "ARCHIVE",
+    "result": "RESULT"
+  },
+  "error": {
+    "title": "Data stream corrupted. Terminal unavailable.",
+    "reload": "Reload"
+  },
+  "langSwitch": "中"
+}

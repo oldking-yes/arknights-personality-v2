@@ -1,14 +1,26 @@
 {
   "name": "arknights-personality-v2",
   "private": true,
-  "version": "2.0.0",
-  "description": "罗德岛干员人格测试 — 15道战术情境题，5维人格图谱，匹配16位明日方舟干员",
+  "version": "3.0.0",
+  "description": "罗德岛干员人格测试 — 15道战术情境题，5维人格图谱，匹配16位明日方舟干员。支持PWA离线安装、中英双语、多平台分享卡片、CP兼容度卡片、罗德岛身份档案",
   "homepage": "https://oldking-yes.github.io/arknights-personality-v2/",
-  "keywords": ["arknights", "personality-test", "quiz", "react", "明日方舟", "人格测试"],
+  "keywords": [
+    "arknights",
+    "personality-test",
+    "quiz",
+    "react",
+    "PWA",
+    "i18n",
+    "明日方舟",
+    "人格测试",
+    "分享卡片"
+  ],
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -16,14 +28,20 @@
     "@tailwindcss/vite": "^4.3.0",
     "chart.js": "^4.5.1",
     "framer-motion": "^12.38.0",
+    "i18next": "^26.2.0",
     "react": "^19.2.6",
     "react-chartjs-2": "^5.3.1",
     "react-dom": "^19.2.6",
-    "tailwindcss": "^4.3.0"
+    "react-i18next": "^17.0.8",
+    "tailwindcss": "^4.3.0",
+    "vite-plugin-pwa": "^1.3.0"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@playwright/test": "^1.60.0",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/node": "^24.12.3",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.2.3",
@@ -32,8 +50,10 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.6.0",
+    "jsdom": "^29.1.1",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.59.2",
-    "vite": "^8.0.12"
+    "vite": "^8.0.12",
+    "vitest": "^4.1.6"
   }
 }

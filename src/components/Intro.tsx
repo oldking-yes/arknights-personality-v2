@@ -1,5 +1,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useState, useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import { toggleLang } from '../i18n';
 
 interface IntroProps {
   onStart: () => void;
@@ -18,6 +20,7 @@ const HAND_WHISPERS = [
 ];
 
 export default function Intro({ onStart, onRandom, onShowAll, onPrtsToggle }: IntroProps) {
+  const { t } = useTranslation();
   const [whisper, setWhisper] = useState('');
   const [whisperKey, setWhisperKey] = useState(0);
   const handRef = useRef<HTMLButtonElement>(null);
@@ -258,6 +261,12 @@ export default function Intro({ onStart, onRandom, onShowAll, onPrtsToggle }: In
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Language toggle */}
+      <button onClick={toggleLang}
+        className="fixed top-4 right-4 z-20 font-mono text-[0.55rem] tracking-widest text-warm-dim/50 hover:text-warm-dim transition-colors cursor-pointer border border-white/5 px-2 py-1">
+        {t('langSwitch')}
+      </button>
+
       <div className="w-full max-w-xs">
         <motion.div
           initial={{ y: 20, opacity: 0 }}

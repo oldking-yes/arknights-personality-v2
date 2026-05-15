@@ -1,0 +1,76 @@
+{
+  "intro": {
+    "subtitle": "— a personality map of Rhodes Island —",
+    "title": "R.I.",
+    "heading": "罗德岛干员人格测试",
+    "desc1": "战场上的选择，照见你灵魂的形状。",
+    "desc2": "十五道战术情境题，<0>找到与你的频率共振的那位干员。</0>",
+    "meta": "16 operators · 15 questions · 3 min",
+    "start": "开 始 测 试",
+    "tip": "请在安静的时刻打开",
+    "random": "⚡ 直接看结果",
+    "debug": "DEBUG · 全部干员"
+  },
+  "quiz": {
+    "header": "TACTICAL ASSESSMENT",
+    "progress": "Q{current}/{total}",
+    "hint": "[1–4] SELECT · [BKSP] RETURN"
+  },
+  "results": {
+    "subtitle": "与你灵魂共振的干员",
+    "compatibility": "适配度",
+    "soulLabel": "灵魂起源",
+    "personaLabel": "人格速写",
+    "tags": "标签",
+    "dimensionLabel": "维度对比",
+    "matchRanking": "你的匹配排行",
+    "topMatches": "你的 Top 3 干员匹配",
+    "actions": {
+      "shareCard": "生成分享卡片",
+      "share": "分享给好友",
+      "restart": "重新测试",
+      "download": "保存图片",
+      "copyLink": "复制链接",
+      "copyText": "复制分享文案",
+      "challenge": "挑战朋友",
+      "identityArchive": "生成身份档案",
+      "cpCard": "生成 CP 卡片"
+    },
+    "wechat": {
+      "share": "微信分享 · 点击复制",
+      "hint": "复制链接后，打开微信粘贴发送即可",
+      "modalHint": "长按图片保存，或点击右上角 ··· 分享给朋友"
+    },
+    "compatLevel": {
+      "soul": "灵魂共振",
+      "deep": "深度匹配",
+      "surprise": "意外匹配"
+    },
+    "shareModal": "分享卡片",
+    "switchFormat": "切换格式"
+  },
+  "compare": {
+    "title": "罗德岛人格兼容度",
+    "compatPercent": "兼容度",
+    "cpText_high": "你们的灵魂频率在同一波段。",
+    "cpText_mid": "你们有截然不同的战场风格，却恰好互补。",
+    "cpText_low": "你们的频率相隔很远，但这未必不是一种吸引。",
+    "challengeHint": "我测出来是{op}，你也来测测？"
+  },
+  "identityArchive": {
+    "title": "罗德岛 · 人员档案",
+    "fileNo": "档案编号",
+    "assessment": "Personnel Assessment"
+  },
+  "footer": {
+    "idle": "IDLE",
+    "quiz": "Q{current}/{total}",
+    "archive": "ARCHIVE",
+    "result": "RESULT"
+  },
+  "error": {
+    "title": "数据流紊乱，终端暂不可用。",
+    "reload": "重新加载"
+  },
+  "langSwitch": "EN"
+}

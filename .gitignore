@@ -33,3 +33,6 @@ test-results/
 # Audit/test scripts
 audit-report/
 audit-test.mjs
+
+# MCP config
+.mcp.json
