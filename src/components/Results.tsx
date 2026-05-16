@@ -8,6 +8,8 @@ import {
   generateShareCard, generateCPCard, generateIdentityArchive,
   buildShareUrl, buildChallengeUrl,
 } from '../utils/shareCards';
+import { getCPPartner, CP_TAG } from '../data/cp';
+import { OPERATORS } from '../data/operators';
 import type { ShareFormat } from '../utils/shareCards';
 
 interface ResultsProps {
@@ -86,18 +88,6 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
     a.href = shareImg;
     a.click();
   }, [shareImg, op.id, shareFormat]);
-
-  const handleWebShare = useCallback(async () => {
-    if (navigator.share) {
-      try { await navigator.share({ title: '\u{7F57}\u{5FB7}\u{5C9B}\u{5E72}\u{5458}\u{4EBA}\u{683C}\u{6D4B}\u{8BD5}', text: shareText, url: shareUrl }); return; } catch {}
-    }
-    try {
-      await navigator.clipboard.writeText(shareText + '\n' + shareUrl);
-      alert('\u{5206}\u{4EAB}\u{94FE}\u{63A5}\u{5DF2}\u{590D}\u{5236}\u{FF01}' + (isWechat ? '\n\u{8BF7}\u{70B9}\u{51FB}\u{53F3}\u{4E0A}\u{89D2} \u{00B7}\u{00B7}\u{00B7} \u{53D1}\u{9001}\u{7ED9}\u{670B}\u{53CB}\u{3002}' : ''));
-    } catch {
-      prompt('\u{590D}\u{5236}\u{4EE5}\u{4E0B}\u{94FE}\u{63A5}\u{5206}\u{4EAB}\u{7ED9}\u{597D}\u{53CB}\u{FF1A}', shareUrl);
-    }
-  }, [shareText, shareUrl, isWechat]);
 
   const copyShareText = useCallback(() => {
     navigator.clipboard.writeText(shareText + '\n' + shareUrl);
@@ -227,60 +217,61 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
             </div>
           </motion.div>
 
-          {/* ═══════ CP Soul Resonance — 星座风格配对 ═══════ */}
-          {ranking[1] && (
-            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.55 }}>
-              <div className="cp-section">
-                <div className="cp-label">Soul Resonance · 灵魂共振</div>
-                <div className="cp-pair">
-                  <div className="flex flex-col items-center gap-1">
-                    <img
-                      src={IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png'}
-                      alt={op.name}
-                      className="cp-avatar cp-avatar-user"
-                    />
-                    <span className="font-serif-en text-[0.6rem] text-warm-muted tracking-[0.05em]">{op.name}</span>
+          {/* ═══════ CP Soul Resonance — 官配优先，算法兜底 ═══════ */}
+          {(() => {
+            const canonPartnerId = getCPPartner(op.id);
+            const canonPartner = canonPartnerId ? OPERATORS.find(o => o.id === canonPartnerId) : null;
+            const cpMatch = canonPartner || ranking[1]?.op;
+            if (!cpMatch) return null;
+            const cpCompat = (() => {
+              const dist = Math.sqrt(userCoords.reduce((sum, c, i) => sum + (c - cpMatch.coords[i]) ** 2, 0));
+              return Math.max(0, Math.round((1 - dist / Math.sqrt(500)) * 100));
+            })();
+            const cpTagKey = [op.id, cpMatch.id].sort().join('|');
+            const cpTag = CP_TAG[cpTagKey];
+            return (
+              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.55 }}>
+                <div className="cp-section">
+                  <div className="cp-label">{cpTag ? cpTag : 'Soul Resonance · 灵魂共振'}</div>
+                  <div className="cp-pair">
+                    <div className="flex flex-col items-center gap-1">
+                      <img src={IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png'} alt={op.name}
+                        className="cp-avatar cp-avatar-user" />
+                      <span className="font-serif-en text-[0.6rem] text-warm-muted tracking-[0.05em]">{op.name}</span>
+                    </div>
+                    <div className="cp-connector">
+                      <span className="cp-heart">{canonPartner ? '⬡' : '◆'}</span>
+                      <span className="cp-compat-number">{cpCompat}</span>
+                      <span className="font-mono text-[0.45rem] text-warm-dim/60">%</span>
+                    </div>
+                    <div className="flex flex-col items-center gap-1">
+                      <img src={IMG + 'avatar/' + cpMatch.avatar.replace('#', '%23') + '.png'} alt={cpMatch.name}
+                        className="cp-avatar cp-avatar-partner" />
+                      <span className="font-serif-en text-[0.6rem] text-warm-dim/80 tracking-[0.05em]">{cpMatch.name}</span>
+                    </div>
                   </div>
-                  <div className="cp-connector">
-                    <span className="cp-heart">◆</span>
-                    <span className="cp-compat-number">{ranking[1].compatible}</span>
-                    <span className="font-mono text-[0.45rem] text-warm-dim/60">%</span>
-                  </div>
-                  <div className="flex flex-col items-center gap-1">
-                    <img
-                      src={IMG + 'avatar/' + ranking[1].op.avatar.replace('#', '%23') + '.png'}
-                      alt={ranking[1].op.name}
-                      className="cp-avatar cp-avatar-partner"
-                    />
-                    <span className="font-serif-en text-[0.6rem] text-warm-dim/80 tracking-[0.05em]">{ranking[1].op.name}</span>
-                  </div>
+                  <p className="font-serif-cn text-xs leading-relaxed text-warm-dim/70 mb-4 max-w-[260px] mx-auto">
+                    {canonPartner
+                      ? `在罗德岛的故事里，${op.name}与${cpMatch.name}的羁绊早已写进命运的篇章。`
+                      : cpCompat >= 80
+                      ? `在战场上，${op.name}与${cpMatch.name}的灵魂频率高度共振——仿佛命中注定的搭档。`
+                      : `${op.name}与${cpMatch.name}的风格截然不同，却恰好能在战术中彼此互补。`
+                    }
+                  </p>
+                  <button onClick={() => {
+                    if (shareLoading) return;
+                    setShareLoading(true);
+                    (async () => {
+                      try { setCpImg(await generateCPCard(op, userCoords, cpMatch, cpMatch.coords, cpCompat)); } catch {}
+                      setShareLoading(false);
+                    })();
+                  }} disabled={shareLoading} className="cp-cta">
+                    {shareLoading ? '生成中...' : `✦ 生成 ${op.name} × ${cpMatch.name} CP卡片`}
+                  </button>
                 </div>
-                <p className="font-serif-cn text-xs leading-relaxed text-warm-dim/70 mb-4 max-w-[260px] mx-auto">
-                  {ranking[1].compatible >= 80
-                    ? `在罗德岛的战场上，${op.name}与${ranking[1].op.name}的灵魂频率高度共振——仿佛命中注定的搭档。`
-                    : ranking[1].compatible >= 60
-                    ? `${op.name}与${ranking[1].op.name}的风格截然不同，却恰好能在战术中彼此互补。`
-                    : `${op.name}与${ranking[1].op.name}的相遇或许意外，但最深的羁绊往往始于偶然。`
-                  }
-                </p>
-                <button onClick={() => {
-                  if (shareLoading) return;
-                  setShareLoading(true);
-                  (async () => {
-                    try {
-                      const op2 = ranking[1].op;
-                      const dist = Math.sqrt(userCoords.reduce((sum, c, i) => sum + (c - op2.coords[i]) ** 2, 0));
-                      const compat = Math.max(0, Math.round((1 - dist / Math.sqrt(500)) * 100));
-                      setCpImg(await generateCPCard(op, userCoords, op2, op2.coords, compat));
-                    } catch {}
-                    setShareLoading(false);
-                  })();
-                }} disabled={shareLoading} className="cp-cta">
-                  {shareLoading ? '生成中...' : `✦ 生成 ${op.name} × ${ranking[1].op.name} CP卡片`}
-                </button>
-              </div>
-            </motion.div>
-          )}
+              </motion.div>
+            );
+          })()}
 
           <div className="ornament">· · ·</div>
 
@@ -349,6 +340,29 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
             transition={{ delay: 1.0 }}
             className="flex flex-col items-center gap-3 pb-6"
           >
+            {/* Platform share row */}
+            <div className="section-label" style={{ marginBottom: '12px' }}>分享到</div>
+            <div className="flex gap-3 mb-2">
+              {[
+                { key: 'wechat' as const, label: '微信', icon: '💬', hint: '保存图片后分享到朋友圈或群聊', scheme: '' },
+                { key: 'xiaohongshu' as const, label: '小红书', icon: '📕', hint: '保存图片后在小红书发布笔记', scheme: '' },
+                { key: 'bilibili' as const, label: 'B站', icon: '📺', hint: '保存图片后发布B站动态', scheme: 'https://t.bilibili.com/' },
+              ].map(plat => (
+                <button key={plat.key}
+                  onClick={() => { doGenerate(plat.key).then(() => {
+                    if (plat.scheme) window.open(plat.scheme, '_blank');
+                  }); }}
+                  disabled={shareLoading}
+                  className="flex flex-col items-center gap-1 px-3 py-2 bg-white/[0.03] border cursor-pointer transition-all duration-200 hover:bg-white/[0.06] hover:border-lemon/20 disabled:opacity-40"
+                  style={{ borderColor: 'rgba(184,176,160,0.15)' }}
+                >
+                  <span className="text-base">{plat.icon}</span>
+                  <span className="font-serif-cn text-[0.6rem] tracking-[0.1em] text-warm-dim">{plat.label}</span>
+                </button>
+              ))}
+            </div>
+
+            {/* Format picker + generate */}
             <div className="flex gap-1 mb-1">
               {FORMAT_LABELS.map(f => (
                 <button key={f.key} onClick={() => doGenerate(f.key)} disabled={shareLoading}
@@ -361,12 +375,7 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
             <button onClick={() => doGenerate('wechat')} disabled={shareLoading}
               className="inline-block px-10 py-3 text-deep-900 font-serif-cn text-sm tracking-[0.25em] cursor-pointer transition-all duration-300 hover:opacity-90 active:scale-[0.97] disabled:opacity-50"
               style={{ background: '#E8E3D8' }}>
-              {shareLoading ? '\u{751F}\u{6210}\u{4E2D}...' : t('results.actions.shareCard')}
-            </button>
-            <button onClick={handleWebShare}
-              className="inline-block px-10 py-3 bg-transparent text-warm-muted border font-serif-cn text-sm tracking-[0.25em] cursor-pointer transition-all duration-300 hover:text-warm-white active:scale-[0.97]"
-              style={{ borderColor: 'rgba(184,176,160,0.25)' }}>
-              {isWechat ? t('results.wechat.share') : t('results.actions.share')}
+              {shareLoading ? '生成中...' : t('results.actions.shareCard')}
             </button>
 
             <div className="flex gap-3 mt-2">

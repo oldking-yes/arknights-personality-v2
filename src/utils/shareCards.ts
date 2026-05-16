@@ -15,6 +15,28 @@ function loadImg(src: string): Promise<HTMLImageElement | null> {
   });
 }
 
+/** Load a QR code image for the given URL. Uses qrserver API with warm-white-on-dark palette. */
+async function loadQR(url: string, size: number = 100): Promise<HTMLImageElement | null> {
+  const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}&color=E8E3D8&bgcolor=0D0F11&margin=8`;
+  return loadImg(qrUrl);
+}
+
+/** Draw a QR code + subtle label at given position */
+async function drawQRFooter(ctx: CanvasRenderingContext2D, qrUrl: string, x: number, y: number, size: number, label: string = '扫码开始测试') {
+  const qrImg = await loadQR(qrUrl, size);
+  if (!qrImg) {
+    // Fallback: just draw URL text
+    ctx.fillStyle = '#5A5040'; ctx.font = '10px "Cormorant Garamond", serif';
+    ctx.textAlign = 'center'; ctx.fillText(qrUrl, x, y + size / 2);
+    return;
+  }
+  // QR code
+  ctx.drawImage(qrImg, x - size / 2, y, size, size);
+  // Label below
+  ctx.fillStyle = '#6A6050'; ctx.font = '11px "Noto Sans SC", sans-serif';
+  ctx.textAlign = 'center'; ctx.fillText(label, x, y + size + 16);
+}
+
 /** Draw pentagon radar chart */
 export function drawRadar(
   ctx: CanvasRenderingContext2D,
@@ -221,8 +243,8 @@ async function drawWechatCard(ctx: CanvasRenderingContext2D, W: number, H: numbe
   });
 
   ctx.fillStyle = '#5A5040'; ctx.font = '13px "Cormorant Garamond", serif';
-  ctx.fillText('罗德岛干员人格测试 · R.I. Personality Quiz', W / 2, H - 60);
-  ctx.font = '11px "Cormorant Garamond", serif'; ctx.fillText(shareUrl, W / 2, H - 38);
+  ctx.fillText('罗德岛干员人格测试 · R.I. Personality Quiz', W / 2, H - 80);
+  await drawQRFooter(ctx, shareUrl, W / 2, H - 70, 64, '扫码开始测试');
 }
 
 /** 小🍠 1:1 card (1080×1080) — magazine-style, big portrait */
@@ -281,8 +303,8 @@ async function drawXiaohongshuCard(ctx: CanvasRenderingContext2D, W: number, H: 
 
   // Footer
   ctx.fillStyle = '#5A5040'; ctx.font = '18px "Cormorant Garamond", serif';
-  ctx.fillText('测测你的干员人格 →', W / 2, H - 60);
-  ctx.font = '14px "Cormorant Garamond", serif'; ctx.fillText(shareUrl, W / 2, H - 30);
+  ctx.fillText('测测你的干员人格 · 扫码开始', W / 2 - 70, H - 50);
+  await drawQRFooter(ctx, shareUrl, W - 120, H - 140, 90, '');
 }
 
 /** B站 16:9 card (1280×720) — split layout */
@@ -349,13 +371,10 @@ async function drawBilibiliCard(ctx: CanvasRenderingContext2D, W: number, H: num
     ctx.fillText(`#${i + 2} ${m.op.name} · ${m.compatible}%`, rightCX, ry); ry += 28;
   });
 
-  // CTA
+  // CTA + QR
   ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 22px "Cormorant Garamond", serif';
   ctx.fillText('看看你的干员人格 →', rightCX, H - 50);
-
-  // Footer
-  ctx.fillStyle = '#5A5040'; ctx.font = '12px "Cormorant Garamond", serif';
-  ctx.fillText(shareUrl, rightCX, H - 22);
+  await drawQRFooter(ctx, shareUrl, W - 80, H - 110, 72, '');
 }
 
 /** CP compatibility card (1080×1080 square) */
