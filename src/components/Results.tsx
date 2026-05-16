@@ -107,18 +107,6 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
     navigator.clipboard.writeText(`\u{2694}\u{FE0F} \u{6211}\u{6D4B}\u{51FA}\u{6765}\u{662F}\u{300C}${op.name}\u{300D}(${compatible}%)\u{FF0C}\u{731C}\u{731C}\u{4F60}\u{4F1A}\u{662F}\u{8C01}\u{FF1F}\n${challengeUrl}`);
   }, [op.name, compatible, challengeUrl]);
 
-  const handleCPCard = useCallback(async () => {
-    if (shareLoading) return;
-    setShareLoading(true);
-    try {
-      const op2 = ranking[1]?.op || ranking[0].op;
-      const dist = Math.sqrt(userCoords.reduce((sum, c, i) => sum + (c - op2.coords[i]) ** 2, 0));
-      const compat = Math.max(0, Math.round((1 - dist / Math.sqrt(500)) * 100));
-      setCpImg(await generateCPCard(op, userCoords, op2, op2.coords, compat));
-    } catch {}
-    setShareLoading(false);
-  }, [shareLoading, op, userCoords, ranking]);
-
   const handleIdentityArchive = useCallback(async () => {
     if (shareLoading) return;
     setShareLoading(true);
@@ -239,6 +227,61 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
             </div>
           </motion.div>
 
+          {/* ═══════ CP Soul Resonance — 星座风格配对 ═══════ */}
+          {ranking[1] && (
+            <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.55 }}>
+              <div className="cp-section">
+                <div className="cp-label">Soul Resonance · 灵魂共振</div>
+                <div className="cp-pair">
+                  <div className="flex flex-col items-center gap-1">
+                    <img
+                      src={IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png'}
+                      alt={op.name}
+                      className="cp-avatar cp-avatar-user"
+                    />
+                    <span className="font-serif-en text-[0.6rem] text-warm-muted tracking-[0.05em]">{op.name}</span>
+                  </div>
+                  <div className="cp-connector">
+                    <span className="cp-heart">◆</span>
+                    <span className="cp-compat-number">{ranking[1].compatible}</span>
+                    <span className="font-mono text-[0.45rem] text-warm-dim/60">%</span>
+                  </div>
+                  <div className="flex flex-col items-center gap-1">
+                    <img
+                      src={IMG + 'avatar/' + ranking[1].op.avatar.replace('#', '%23') + '.png'}
+                      alt={ranking[1].op.name}
+                      className="cp-avatar cp-avatar-partner"
+                    />
+                    <span className="font-serif-en text-[0.6rem] text-warm-dim/80 tracking-[0.05em]">{ranking[1].op.name}</span>
+                  </div>
+                </div>
+                <p className="font-serif-cn text-xs leading-relaxed text-warm-dim/70 mb-4 max-w-[260px] mx-auto">
+                  {ranking[1].compatible >= 80
+                    ? `在罗德岛的战场上，${op.name}与${ranking[1].op.name}的灵魂频率高度共振——仿佛命中注定的搭档。`
+                    : ranking[1].compatible >= 60
+                    ? `${op.name}与${ranking[1].op.name}的风格截然不同，却恰好能在战术中彼此互补。`
+                    : `${op.name}与${ranking[1].op.name}的相遇或许意外，但最深的羁绊往往始于偶然。`
+                  }
+                </p>
+                <button onClick={() => {
+                  if (shareLoading) return;
+                  setShareLoading(true);
+                  (async () => {
+                    try {
+                      const op2 = ranking[1].op;
+                      const dist = Math.sqrt(userCoords.reduce((sum, c, i) => sum + (c - op2.coords[i]) ** 2, 0));
+                      const compat = Math.max(0, Math.round((1 - dist / Math.sqrt(500)) * 100));
+                      setCpImg(await generateCPCard(op, userCoords, op2, op2.coords, compat));
+                    } catch {}
+                    setShareLoading(false);
+                  })();
+                }} disabled={shareLoading} className="cp-cta">
+                  {shareLoading ? '生成中...' : `✦ 生成 ${op.name} × ${ranking[1].op.name} CP卡片`}
+                </button>
+              </div>
+            </motion.div>
+          )}
+
           <div className="ornament">· · ·</div>
 
           {/* ═══════ TIER 3: Details — Persona + Epigraph + Soul ═══════ */}
@@ -326,11 +369,6 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
               {isWechat ? t('results.wechat.share') : t('results.actions.share')}
             </button>
 
-            <button onClick={handleCPCard} disabled={shareLoading}
-              className="bg-transparent text-warm-dim font-serif-cn text-xs tracking-[0.15em] cursor-pointer border px-3 py-1.5 transition-all duration-200 hover:text-warm-muted disabled:opacity-40"
-              style={{ borderColor: 'rgba(184,176,160,0.15)' }}>
-              {t('results.actions.cpCard')}
-            </button>
             <div className="flex gap-3 mt-2">
               <button onClick={handleIdentityArchive} disabled={shareLoading}
                 className="bg-transparent text-warm-dim font-serif-cn text-xs tracking-[0.15em] cursor-pointer border px-3 py-1.5 transition-all duration-200 hover:text-warm-muted disabled:opacity-40"
