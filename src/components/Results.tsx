@@ -28,8 +28,8 @@ function charUrl(op: { portrait?: string; avatar: string }, fallback: boolean) {
       : IMG + 'portrait/' + op.portrait;
   }
   return fallback
-    ? IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png'
-    : IMG + 'skin/' + op.avatar.replace('#', '%23') + '_2b.png';
+    ? IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.jpg'
+    : IMG + 'skin/' + op.avatar.replace('#', '%23') + '_2b.jpg';
 }
 
 const FORMAT_LABELS: { key: ShareFormat; label: string }[] = [
@@ -51,6 +51,7 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
   const [cpImg, setCpImg] = useState('');
   const [archiveImg, setArchiveImg] = useState('');
   const [showChallenge, setShowChallenge] = useState(false);
+  const [shareModal, setShareModal] = useState<{ img: string; platform: string; copy: string } | null>(null);
 
   const items = DIM_LABELS.map((label, i) => ({
     label, user: userCoords[i], op: op.coords[i]
@@ -61,6 +62,25 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
   const challengeUrl = buildChallengeUrl(userCoords);
   const shareIntro = compatible >= 80 ? t('results.compatLevel.soul') : compatible >= 60 ? t('results.compatLevel.deep') : t('results.compatLevel.surprise');
   const shareText = `🔮 罗德岛人格测试 · ${shareIntro}\n我与「${op.name}」的适配度高达 ${compatible}%\n「${op.title}」\n\n来测测看你会匹配到哪位干员 → ${shareUrl}`;
+
+  const cpName = (() => {
+    const canonPartnerId = getCPPartner(op.id);
+    if (canonPartnerId) return OPERATORS.find(o => o.id === canonPartnerId)?.name || ranking[1]?.op.name || '';
+    return ranking[1]?.op.name || '';
+  })();
+
+  /** Generate platform-specific copy text */
+  const getPlatformCopy = (platform: string) => {
+    const base = shareUrl;
+    switch (platform) {
+      case 'xiaohongshu':
+        return `#明日方舟 #罗德岛人格测试 #干员人格测试\n\n我的干员人格是【${op.name}】——${op.title}\n${compatible}% 灵魂适配度✨\n\n${cpName ? `和我灵魂共振的是${cpName}！\n` : ''}这个测试真的准，泰拉大陆上的另一个自己。\n\n你也来测测？链接在主页~\n#二次元 #人格测试`;
+      case 'bilibili':
+        return `【罗德岛干员人格测试】\n我测出来是${op.name}！！(ﾟ∀ﾟ)\n${compatible}%适配度，果然是${op.clazz}人格吗www\n${cpName ? `和我CP的是${cpName}，宿命啊这是\n` : ''}弹幕告诉我你们的匹配结果→\n${base}`;
+      default: // wechat
+        return `测了一下这个罗德岛人格测试…\n我匹配的是「${op.name}」——${op.title}\n${compatible}% 适配度${cpName ? `，和我灵魂共振的是${cpName}` : ''}\n你们测出来是谁？来评论区卷一下👇\n${base}`;
+    }
+  };
 
   const isWechat = /MicroMessenger/i.test(navigator.userAgent);
 
@@ -235,7 +255,7 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
                   <div className="cp-label">{cpTag ? cpTag : 'Soul Resonance · 灵魂共振'}</div>
                   <div className="cp-pair">
                     <div className="flex flex-col items-center gap-1">
-                      <img src={IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png'} alt={op.name}
+                      <img src={IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.jpg'} alt={op.name}
                         className="cp-avatar cp-avatar-user" />
                       <span className="font-serif-en text-[0.6rem] text-warm-muted tracking-[0.05em]">{op.name}</span>
                     </div>
@@ -245,7 +265,7 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
                       <span className="font-mono text-[0.45rem] text-warm-dim/60">%</span>
                     </div>
                     <div className="flex flex-col items-center gap-1">
-                      <img src={IMG + 'avatar/' + cpMatch.avatar.replace('#', '%23') + '.png'} alt={cpMatch.name}
+                      <img src={IMG + 'avatar/' + cpMatch.avatar.replace('#', '%23') + '.jpg'} alt={cpMatch.name}
                         className="cp-avatar cp-avatar-partner" />
                       <span className="font-serif-en text-[0.6rem] text-warm-dim/80 tracking-[0.05em]">{cpMatch.name}</span>
                     </div>
@@ -318,7 +338,7 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
                   style={{ borderColor: 'rgba(184,176,160,0.12)' }}
                   onClick={() => onViewOp?.(m.op.id)}
                 >
-                  <img src={IMG + 'avatar/' + m.op.avatar.replace('#', '%23') + '.png'} alt={m.op.name}
+                  <img src={IMG + 'avatar/' + m.op.avatar.replace('#', '%23') + '.jpg'} alt={m.op.name}
                     className="w-10 h-10 rounded-full object-cover" />
                   <div className="flex flex-col min-w-0">
                     <span className="font-serif-en text-sm text-white">{m.op.name}</span>
@@ -344,14 +364,20 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
             <div className="section-label" style={{ marginBottom: '12px' }}>分享到</div>
             <div className="flex gap-3 mb-2">
               {[
-                { key: 'wechat' as const, label: '微信', icon: '💬', hint: '保存图片后分享到朋友圈或群聊', scheme: '' },
-                { key: 'xiaohongshu' as const, label: '小红书', icon: '📕', hint: '保存图片后在小红书发布笔记', scheme: '' },
-                { key: 'bilibili' as const, label: 'B站', icon: '📺', hint: '保存图片后发布B站动态', scheme: 'https://t.bilibili.com/' },
+                { key: 'wechat' as const, label: '朋友圈', icon: '💬' },
+                { key: 'xiaohongshu' as const, label: '小红书', icon: '📕' },
+                { key: 'bilibili' as const, label: 'B站', icon: '📺' },
               ].map(plat => (
                 <button key={plat.key}
-                  onClick={() => { doGenerate(plat.key).then(() => {
-                    if (plat.scheme) window.open(plat.scheme, '_blank');
-                  }); }}
+                  onClick={async () => {
+                    if (shareLoading) return;
+                    setShareLoading(true);
+                    try {
+                      const img = await generateShareCard({ format: plat.key, op, compatible, userCoords, ranking, shareUrl });
+                      setShareModal({ img, platform: plat.key, copy: getPlatformCopy(plat.key) });
+                    } catch {}
+                    setShareLoading(false);
+                  }}
                   disabled={shareLoading}
                   className="flex flex-col items-center gap-1 px-3 py-2 bg-white/[0.03] border cursor-pointer transition-all duration-200 hover:bg-white/[0.06] hover:border-lemon/20 disabled:opacity-40"
                   style={{ borderColor: 'rgba(184,176,160,0.15)' }}
@@ -406,6 +432,55 @@ export default function Results({ result, onRestart, onViewOp, challengeCoords }
           )}
         </div>
       </motion.div>
+
+      {/* Platform Share Modal — image preview + copy text + save instruction */}
+      {shareModal && (
+        <div className="fixed inset-0 z-50 flex flex-col items-center justify-center p-4 overflow-auto"
+          style={{ background: 'rgba(13,15,17,0.97)' }}
+          onClick={() => setShareModal(null)}>
+          <button className="absolute top-4 right-5 text-warm-white text-3xl font-serif-en cursor-pointer z-10"
+            onClick={() => setShareModal(null)}>&times;</button>
+          <div className="flex flex-col items-center gap-4 max-w-sm w-full" onClick={e => e.stopPropagation()}>
+            {/* Image */}
+            <img src={shareModal.img} alt="分享卡片" className="w-full rounded shadow-2xl" />
+            {/* Hint */}
+            <p className="font-serif-cn text-xs text-warm-dim text-center">
+              📱 长按图片保存到相册
+            </p>
+            {/* Copy text area */}
+            <div className="w-full relative">
+              <textarea
+                readOnly
+                value={shareModal.copy}
+                className="w-full h-28 bg-white/[0.04] border text-warm-muted font-serif-cn text-xs leading-relaxed p-3 resize-none"
+                style={{ borderColor: 'rgba(184,176,160,0.15)' }}
+                onClick={(e) => (e.target as HTMLTextAreaElement).select()}
+              />
+              <button
+                onClick={() => { navigator.clipboard.writeText(shareModal.copy); }}
+                className="absolute bottom-2 right-2 px-3 py-1 text-deep-900 font-serif-cn text-[0.6rem] tracking-[0.1em] cursor-pointer transition-all duration-200 hover:opacity-80"
+                style={{ background: '#E8E3D8' }}
+              >
+                复制文案
+              </button>
+            </div>
+            {/* Save button */}
+            <button
+              onClick={() => {
+                const a = document.createElement('a');
+                const platLabel = shareModal.platform === 'xiaohongshu' ? 'xiaohongshu' : shareModal.platform === 'bilibili' ? 'bilibili' : 'wechat';
+                a.download = `arknights-${op.id}-${platLabel}.jpg`;
+                a.href = shareModal.img;
+                a.click();
+              }}
+              className="px-8 py-2.5 text-deep-900 font-serif-cn text-sm tracking-[0.2em] cursor-pointer transition-all duration-300 hover:opacity-90 w-full text-center"
+              style={{ background: '#E8E3D8' }}
+            >
+              保存图片
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Share Modal */}
       {showShare && (

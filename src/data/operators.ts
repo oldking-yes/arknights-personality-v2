@@ -2,7 +2,7 @@ import type { Operator } from './types';
 
 export const OPERATORS: Operator[] = [
   { id:'amiya', name:'阿米娅', title:'罗德岛公开领袖·近卫', clazz:'近卫', stars:6,
-    coords:[5,9,6,5,7], color:'#00b8ff', tag:'', avatar:'char_1001_amiya2_sale#16', portrait:'skin/char_1001_amiya2_sale#16b.png',
+    coords:[5,9,6,5,7], color:'#00b8ff', tag:'', avatar:'char_1001_amiya2_sale#16', portrait:'skin/char_1001_amiya2_sale#16b.jpg',
     desc:'年仅14岁的卡特斯少女，罗德岛的公开领袖。拥有卓越的情感共鸣力和不输成年人的决断力。',
     epigraph:'"我始终相信，理解是通向和平的唯一道路。"',
     persona:[
@@ -34,7 +34,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['规则守护者','雷厉风行','赤霄之心','龙门之剑'] },
   { id:'silverash', name:'凛御银灰', title:'喀兰贸易董事长', clazz:'近卫', stars:6,
-    coords:[9,2,7,8,5], color:'#c0c0c0', tag:'', avatar:'char_1045_svash2', portrait:'skin/char_1045_svash2_2b.png',
+    coords:[9,2,7,8,5], color:'#c0c0c0', tag:'', avatar:'char_1045_svash2', portrait:'skin/char_1045_svash2_2b.jpg',
     desc:'希瓦艾什家族族长。棋手思维——永远领先三步。',
     epigraph:'"最好的防御不是躲在盾牌后面，是让别人不敢攻击你。"',
     persona:[
@@ -146,7 +146,7 @@ export const OPERATORS: Operator[] = [
     ],
     tags:['不灭的火焰','精英干员','勇往直前','电锯轰鸣'] },
   { id:'kaltsit', name:'凯尔希·思衡托', title:'罗德岛医疗主管', clazz:'医疗', stars:6,
-    coords:[9,3,5,8,3], color:'#44cc88', tag:'', avatar:'char_1052_kalts2', portrait:'skin/char_1052_kalts2_2b.png',
+    coords:[9,3,5,8,3], color:'#44cc88', tag:'', avatar:'char_1052_kalts2', portrait:'skin/char_1052_kalts2_2b.jpg',
     desc:'罗德岛医疗部负责人。Mon3tr 是她最温和的一面。',
     epigraph:'"真理不需要被任何人喜欢。它只需要被知道。"',
     persona:[

@@ -331,7 +331,7 @@ function DebugView({ onBack, initialOp, onCloseOp }: { onBack: () => void; initi
           <button key={op.id}
             className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 text-left cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-white/20"
             onClick={() => setSelected(op)}>
-            <img src={cdn+op.avatar.replace('#','%23')+'.png'} alt={op.name} className="w-10 h-10 rounded-full object-cover"
+            <img src={cdn+op.avatar.replace('#','%23')+'.jpg'} alt={op.name} className="w-10 h-10 rounded-full object-cover"
               onError={e=>(e.target as HTMLElement).style.display='none'} />
             <div className="min-w-0">
               <div className="font-serif-cn text-sm text-warm-white truncate">{op.name}</div>
@@ -346,15 +346,15 @@ function DebugView({ onBack, initialOp, onCloseOp }: { onBack: () => void; initi
 
 function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
   const basePath = import.meta.env.BASE_URL;
-  const avatarUrl = basePath + 'images/avatar/' + op.avatar.replace('#','%23') + '.png';
+  const avatarUrl = basePath + 'images/avatar/' + op.avatar.replace('#','%23') + '.jpg';
   const [heroFallback, setHeroFallback] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const p = (s: string) => basePath + 'images/' + s;
   const portraitUrl = op.portrait
     ? (op.portrait.startsWith('skin/') ? p(op.portrait.replace('#','%23')) : p('portrait/' + op.portrait))
     : heroFallback
-      ? p('avatar/' + op.avatar.replace('#', '%23') + '.png')
-      : p('skin/' + op.avatar.replace('#','%23') + '_2b.png');
+      ? p('avatar/' + op.avatar.replace('#', '%23') + '.jpg')
+      : p('skin/' + op.avatar.replace('#','%23') + '_2b.jpg');
 
   const detailMsgs = [
     '作战记录 #' + Math.floor(Math.random() * 9000 + 1000),

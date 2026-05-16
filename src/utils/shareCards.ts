@@ -21,22 +21,6 @@ async function loadQR(url: string, size: number = 100): Promise<HTMLImageElement
   return loadImg(qrUrl);
 }
 
-/** Draw a QR code + subtle label at given position */
-async function drawQRFooter(ctx: CanvasRenderingContext2D, qrUrl: string, x: number, y: number, size: number, label: string = '扫码开始测试') {
-  const qrImg = await loadQR(qrUrl, size);
-  if (!qrImg) {
-    // Fallback: just draw URL text
-    ctx.fillStyle = '#5A5040'; ctx.font = '10px "Cormorant Garamond", serif';
-    ctx.textAlign = 'center'; ctx.fillText(qrUrl, x, y + size / 2);
-    return;
-  }
-  // QR code
-  ctx.drawImage(qrImg, x - size / 2, y, size, size);
-  // Label below
-  ctx.fillStyle = '#6A6050'; ctx.font = '11px "Noto Sans SC", sans-serif';
-  ctx.textAlign = 'center'; ctx.fillText(label, x, y + size + 16);
-}
-
 /** Draw pentagon radar chart */
 export function drawRadar(
   ctx: CanvasRenderingContext2D,
@@ -192,7 +176,7 @@ async function drawWechatCard(ctx: CanvasRenderingContext2D, W: number, H: numbe
   ctx.fillStyle = grad; ctx.fillRect(0, 0, W, 450);
 
   // Avatar
-  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png');
+  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.jpg');
   if (avatarImg) { ctx.save(); ctx.beginPath(); ctx.arc(W / 2, 80, 48, 0, Math.PI * 2); ctx.closePath(); ctx.clip(); ctx.drawImage(avatarImg, W / 2 - 48, 32, 96, 96); ctx.restore(); }
 
   ctx.textAlign = 'center';
@@ -242,9 +226,8 @@ async function drawWechatCard(ctx: CanvasRenderingContext2D, W: number, H: numbe
     ctx.fillText(`#${i + 2} ${m.op.name} · ${m.compatible}%`, W / 2, ty); ty += 28;
   });
 
-  ctx.fillStyle = '#5A5040'; ctx.font = '13px "Cormorant Garamond", serif';
-  ctx.fillText('罗德岛干员人格测试 · R.I. Personality Quiz', W / 2, H - 80);
-  await drawQRFooter(ctx, shareUrl, W / 2, H - 70, 64, '扫码开始测试');
+  ctx.fillText('罗德岛干员人格测试 · R.I. Personality Quiz', W / 2, H - 90);
+  await drawHexQR(ctx, shareUrl, W / 2, H - 60, 72);
 }
 
 /** 小🍠 1:1 card (1080×1080) — magazine-style, big portrait */
@@ -257,7 +240,7 @@ async function drawXiaohongshuCard(ctx: CanvasRenderingContext2D, W: number, H: 
   // Large portrait as background
   const portraitSrc = op.portrait?.startsWith('skin/')
     ? IMG + op.portrait.replace('#', '%23')
-    : IMG + 'skin/' + op.avatar.replace('#', '%23') + '_2b.png';
+    : IMG + 'skin/' + op.avatar.replace('#', '%23') + '_2b.jpg';
   const portraitImg = await loadImg(portraitSrc);
   if (portraitImg) {
     ctx.save();
@@ -277,7 +260,7 @@ async function drawXiaohongshuCard(ctx: CanvasRenderingContext2D, W: number, H: 
   ctx.textAlign = 'center';
 
   // Avatar (large)
-  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png');
+  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.jpg');
   if (avatarImg) {
     ctx.save(); ctx.beginPath(); ctx.arc(W / 2, 300, 120, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
     ctx.drawImage(avatarImg, W / 2 - 120, 180, 240, 240); ctx.restore();
@@ -302,9 +285,8 @@ async function drawXiaohongshuCard(ctx: CanvasRenderingContext2D, W: number, H: 
   drawRadar(ctx, W / 2, 880, 130, userCoords, op.coords, op.color);
 
   // Footer
-  ctx.fillStyle = '#5A5040'; ctx.font = '18px "Cormorant Garamond", serif';
-  ctx.fillText('测测你的干员人格 · 扫码开始', W / 2 - 70, H - 50);
-  await drawQRFooter(ctx, shareUrl, W - 120, H - 140, 90, '');
+  ctx.fillText('测测你的干员人格 · 扫码开始', W / 2 - 80, H - 50);
+  await drawHexQR(ctx, shareUrl, W - 130, H - 150, 96);
 }
 
 /** B站 16:9 card (1280×720) — split layout */
@@ -323,7 +305,7 @@ async function drawBilibiliCard(ctx: CanvasRenderingContext2D, W: number, H: num
   ctx.fillStyle = grad; ctx.fillRect(0, 0, leftW, H);
 
   // Avatar
-  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png');
+  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.jpg');
   if (avatarImg) { ctx.save(); ctx.beginPath(); ctx.arc(centerX, 160, 70, 0, Math.PI * 2); ctx.closePath(); ctx.clip(); ctx.drawImage(avatarImg, centerX - 70, 90, 140, 140); ctx.restore(); }
 
   ctx.textAlign = 'center';
@@ -372,70 +354,154 @@ async function drawBilibiliCard(ctx: CanvasRenderingContext2D, W: number, H: num
   });
 
   // CTA + QR
-  ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 22px "Cormorant Garamond", serif';
-  ctx.fillText('看看你的干员人格 →', rightCX, H - 50);
-  await drawQRFooter(ctx, shareUrl, W - 80, H - 110, 72, '');
+  ctx.fillText('看看你的干员人格 →', rightCX, H - 60);
+  await drawHexQR(ctx, shareUrl, W - 80, H - 120, 80);
 }
 
-/** CP compatibility card (1080×1080 square) */
+/** Draw hex-framed QR code — warm-white hex ring around the QR */
+async function drawHexQR(ctx: CanvasRenderingContext2D, url: string, cx: number, cy: number, size: number) {
+  // Outer hex ring
+  ctx.save();
+  ctx.translate(cx, cy);
+  const hexR = size / 2 + 16;
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const a = (i * 60 - 30) * Math.PI / 180;
+    const x = hexR * Math.cos(a), y = hexR * Math.sin(a);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = `rgba(245,230,92,0.2)`;
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  // Inner ring
+  ctx.beginPath();
+  for (let i = 0; i < 6; i++) {
+    const a = (i * 60 - 30) * Math.PI / 180;
+    const x = (hexR - 4) * Math.cos(a), y = (hexR - 4) * Math.sin(a);
+    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.strokeStyle = `rgba(245,230,92,0.08)`;
+  ctx.stroke();
+  ctx.restore();
+
+  // QR code
+  const qrImg = await loadQR(url, size);
+  if (qrImg) {
+    // Round-clipped QR inset
+    ctx.save();
+    ctx.beginPath();
+    ctx.roundRect(cx - size / 2, cy - size / 2, size, size, 8);
+    ctx.closePath();
+    ctx.clip();
+    ctx.drawImage(qrImg, cx - size / 2, cy - size / 2, size, size);
+    ctx.restore();
+    // Subtle border
+    ctx.strokeStyle = 'rgba(232,227,216,0.15)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(cx - size / 2, cy - size / 2, size, size, 8);
+    ctx.stroke();
+  }
+}
+
+/** CP compatibility card — 3:4 vertical (900×1200) */
 export async function generateCPCard(
   op1: Operator, coords1: number[], op2: Operator, coords2: number[], compat: number,
 ): Promise<string> {
-  const W = 1080, H = 1080;
+  const W = 900, H = 1200;
   const canvas = document.createElement('canvas');
   canvas.width = W; canvas.height = H;
   const ctx = canvas.getContext('2d');
   if (!ctx) throw new Error('No canvas context');
 
   ctx.fillStyle = '#0D0F11'; ctx.fillRect(0, 0, W, H);
-  drawHexBg(ctx, 24, 28);
+  drawHexBg(ctx, 20, 30);
 
-  // Op1 portrait (left side, muted)
-  const img1 = await loadImg(IMG + 'avatar/' + op1.avatar.replace('#', '%23') + '.png');
-  if (img1) { ctx.save(); ctx.globalAlpha = 0.25; ctx.drawImage(img1, -100, 100, 500, 500); ctx.restore(); }
+  // Op1 muted portrait (left)
+  const img1 = await loadImg(IMG + 'avatar/' + op1.avatar.replace('#', '%23') + '.jpg');
+  if (img1) { ctx.save(); ctx.globalAlpha = 0.18; ctx.drawImage(img1, -150, 50, 600, 600); ctx.restore(); }
 
-  // Op2 portrait (right side, muted)
-  const img2 = await loadImg(IMG + 'avatar/' + op2.avatar.replace('#', '%23') + '.png');
-  if (img2) { ctx.save(); ctx.globalAlpha = 0.25; ctx.drawImage(img2, W - 400, 100, 500, 500); ctx.restore(); }
+  // Op2 muted portrait (right)
+  const img2 = await loadImg(IMG + 'avatar/' + op2.avatar.replace('#', '%23') + '.jpg');
+  if (img2) { ctx.save(); ctx.globalAlpha = 0.18; ctx.drawImage(img2, W - 450, 50, 600, 600); ctx.restore(); }
 
-  // Title
+  // Header
   ctx.textAlign = 'center';
-  ctx.fillStyle = '#8A8270'; ctx.font = '20px "Cormorant Garamond", serif';
-  ctx.fillText('罗德岛人格兼容度', W / 2, 60);
-
-  // Names
-  ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 48px "Cormorant Garamond", serif';
-  ctx.fillText(op1.name, W / 2 - 200, 140);
-  ctx.fillText(op2.name, W / 2 + 200, 140);
-
-  ctx.fillStyle = op1.color; ctx.font = '20px "Noto Sans SC", sans-serif';
-  ctx.fillText(op1.title, W / 2 - 200, 172);
-  ctx.fillStyle = op2.color; ctx.font = '20px "Noto Sans SC", sans-serif';
-  ctx.fillText(op2.title, W / 2 + 200, 172);
-
-  // "×" between names
-  ctx.fillStyle = '#8A8270'; ctx.font = 'italic 36px "Cormorant Garamond", serif';
-  ctx.fillText('×', W / 2, 155);
-
-  // Dual radar
-  drawDualRadar(ctx, W / 2, 420, 220, coords1, op1.color, op1.name, coords2, op2.color, op2.name);
-
-  // Compatibility
-  ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 80px "Cormorant Garamond", serif';
-  ctx.fillText(`${compat}%`, W / 2, 720);
   ctx.fillStyle = '#8A8270'; ctx.font = '22px "Cormorant Garamond", serif';
-  ctx.fillText('兼容度', W / 2, 752);
+  ctx.fillText('罗德岛 · 灵魂共振', W / 2, 70);
 
-  // CP text
-  const cpText = compat >= 80 ? '你们的灵魂频率在同一波段。' : compat >= 60 ? '你们的战场风格截然不同，却恰好互补。' : '你们的频率相隔很远，但这未必不是一种吸引。';
-  ctx.fillStyle = '#B8B0A0'; ctx.font = '20px "Noto Sans SC", sans-serif';
-  ctx.fillText(cpText, W / 2, 800);
+  // Large names
+  ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 72px "Cormorant Garamond", serif';
+  ctx.fillText(op1.name, W / 2, 170);
+  ctx.fillText(op2.name, W / 2, 260);
+
+  // Diamond connector
+  ctx.fillStyle = 'rgba(245,230,92,0.4)'; ctx.font = '40px serif';
+  ctx.fillText('⬡', W / 2, 228);
+
+  // Subtitles
+  ctx.fillStyle = '#B8B0A0'; ctx.font = '24px "Noto Sans SC", sans-serif';
+  ctx.fillText(op1.title, W / 2, 310);
+  ctx.fillText(op2.title, W / 2, 350);
+
+  // Divider
+  ctx.strokeStyle = 'rgba(245,230,92,0.12)'; ctx.lineWidth = 1;
+  ctx.beginPath(); ctx.moveTo(160, 400); ctx.lineTo(W - 160, 400); ctx.stroke();
+
+  // Dual radar — no legend, clean
+  drawDualRadarClean(ctx, W / 2, 580, 240, coords1, op1.color, coords2, op2.color);
+
+  // Compatibility — big
+  ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 96px "Cormorant Garamond", serif';
+  ctx.fillText(`${compat}%`, W / 2, 880);
+  ctx.fillStyle = '#8A8270'; ctx.font = '26px "Cormorant Garamond", serif';
+  ctx.fillText('灵魂兼容度', W / 2, 920);
+
+  // CP line
+  ctx.fillStyle = '#B8B0A0'; ctx.font = '22px "Noto Sans SC", sans-serif';
+  const cpText = compat >= 80 ? '你们的灵魂频率在同一波段。' : compat >= 60 ? '截然不同的战场风格，恰好彼此互补。' : '相隔很远的频率，自有引力。';
+  ctx.fillText(cpText, W / 2, 970);
+
+  // Hex QR
+  const shareUrl = `${window.location.origin}/arknights-personality-v2/`;
+  await drawHexQR(ctx, shareUrl, W / 2, 1100, 100);
 
   // Footer
   ctx.fillStyle = '#5A5040'; ctx.font = '14px "Cormorant Garamond", serif';
-  ctx.fillText('罗德岛干员人格测试 · R.I. Personality Quiz', W / 2, H - 40);
+  ctx.fillText('扫码开始测试 · R.I. Personality Quiz', W / 2, H - 40);
 
   return canvas.toDataURL('image/jpeg', 0.85);
+}
+
+/** Clean dual radar — no legend labels, just visual overlay */
+function drawDualRadarClean(
+  ctx: CanvasRenderingContext2D, cx: number, cy: number, radius: number,
+  coords1: number[], color1: string, coords2: number[], color2: string,
+) {
+  const angles = DIM_LABELS.map((_, i) => (i * 72 - 90) * Math.PI / 180);
+  // Grid
+  for (let ring = 1; ring <= 5; ring++) {
+    const r = (radius / 5) * ring;
+    ctx.beginPath();
+    angles.forEach((a, i) => i === 0 ? ctx.moveTo(cx + r * Math.cos(a), cy + r * Math.sin(a)) : ctx.lineTo(cx + r * Math.cos(a), cy + r * Math.sin(a)));
+    ctx.closePath();
+    ctx.strokeStyle = `rgba(232,227,216,${0.04 + ring * 0.03})`; ctx.lineWidth = 0.5; ctx.stroke();
+  }
+  // Axes
+  angles.forEach(a => { ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(cx + radius * Math.cos(a), cy + radius * Math.sin(a)); ctx.strokeStyle = 'rgba(232,227,216,0.06)'; ctx.lineWidth = 0.5; ctx.stroke(); });
+  // Labels (smaller, dimmer)
+  ctx.textAlign = 'center'; ctx.fillStyle = '#6A6050'; ctx.font = '14px "Noto Sans SC", sans-serif';
+  angles.forEach((a, i) => { const x = cx + (radius + 32) * Math.cos(a); const y = cy + (radius + 32) * Math.sin(a); ctx.fillText(DIM_LABELS[i], x, y + 4); });
+  // Person 1
+  ctx.beginPath();
+  angles.forEach((a, i) => { const r = (coords1[i] / 10) * radius; const x = cx + r * Math.cos(a); const y = cy + r * Math.sin(a); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+  ctx.closePath(); ctx.fillStyle = color1 + '20'; ctx.fill(); ctx.strokeStyle = color1; ctx.lineWidth = 2; ctx.stroke();
+  // Person 2
+  ctx.beginPath();
+  angles.forEach((a, i) => { const r = (coords2[i] / 10) * radius; const x = cx + r * Math.cos(a); const y = cy + r * Math.sin(a); i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y); });
+  ctx.closePath(); ctx.fillStyle = color2 + '20'; ctx.fill(); ctx.setLineDash([8, 5]); ctx.strokeStyle = color2; ctx.lineWidth = 2; ctx.stroke(); ctx.setLineDash([]);
 }
 
 /** Rhodes Island identity archive wallpaper (750×1334) */
@@ -472,7 +538,7 @@ export async function generateIdentityArchive(
   ctx.fillText('SECURITY LEVEL: CONFIDENTIAL', W - 40, 55);
 
   // Operator portrait
-  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png');
+  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.jpg');
   if (avatarImg) {
     ctx.save(); ctx.beginPath();
     ctx.arc(W / 2, 220, 100, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
