@@ -65,7 +65,7 @@ export default function Intro({ onStart, onRandom, onShowAll, onPrtsToggle }: In
       className="flex flex-col items-center justify-center min-h-screen px-9 py-20 text-center relative overflow-hidden"
     >
       {/* PRTS hex — rotating concentric rings with vertex dots, clickable for terminal */}
-      <button onClick={onPrtsToggle}
+      <button onClick={onPrtsToggle} title="PRTS Terminal"
         className="fixed cursor-pointer select-none z-10 transition-all duration-500 hover:scale-110 hover:opacity-80 hex-glow"
         style={{ top: '10%', left: '5%', width: '130px', height: '130px' }}>
         <svg viewBox="0 0 120 120" className="w-full h-full" fill="none">

@@ -111,7 +111,7 @@ export default function App() {
     const handler = (e: KeyboardEvent) => {
       keyBuf.current = (keyBuf.current + e.key).slice(-6);
       if (keyBuf.current.toLowerCase().includes('prts')) {
-        setPrtsActive(a => !a);
+        if (stage !== 'quiz') { setPrtsActive(a => !a); }
         keyBuf.current = '';
       }
     };
