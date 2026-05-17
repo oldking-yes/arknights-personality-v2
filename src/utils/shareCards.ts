@@ -176,12 +176,12 @@ async function drawWechatCard(ctx: CanvasRenderingContext2D, W: number, H: numbe
   ctx.fillStyle = grad; ctx.fillRect(0, 0, W, 450);
 
   // Avatar
-  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.jpg');
+  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png');
   if (avatarImg) { ctx.save(); ctx.beginPath(); ctx.arc(W / 2, 80, 48, 0, Math.PI * 2); ctx.closePath(); ctx.clip(); ctx.drawImage(avatarImg, W / 2 - 48, 32, 96, 96); ctx.restore(); }
 
   ctx.textAlign = 'center';
   ctx.fillStyle = '#8A8270'; ctx.font = '18px "Cormorant Garamond", serif';
-  ctx.fillText('与你灵魂共振的干员', W / 2, avatarImg ? 165 : 90);
+  ctx.fillText('你的源石解压结果', W / 2, avatarImg ? 165 : 90);
 
   ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 64px "Cormorant Garamond", serif';
   ctx.fillText(op.name, W / 2, avatarImg ? 250 : 180);
@@ -199,7 +199,7 @@ async function drawWechatCard(ctx: CanvasRenderingContext2D, W: number, H: numbe
   ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 48px "Cormorant Garamond", serif';
   ctx.fillText(`${compatible}%`, W / 2, 678);
   ctx.fillStyle = '#8A8270'; ctx.font = '16px "Cormorant Garamond", serif';
-  ctx.fillText('适配度', W / 2, 705);
+  ctx.fillText('解压契合度', W / 2, 705);
 
   ctx.fillStyle = '#B8B0A0'; ctx.font = '16px "Noto Sans SC", sans-serif';
   let ty = 760;
@@ -226,7 +226,7 @@ async function drawWechatCard(ctx: CanvasRenderingContext2D, W: number, H: numbe
     ctx.fillText(`#${i + 2} ${m.op.name} · ${m.compatible}%`, W / 2, ty); ty += 28;
   });
 
-  ctx.fillText('罗德岛干员人格测试 · R.I. Personality Quiz', W / 2, H - 90);
+  ctx.fillText('PRTS 源石解压协议 · Originium Decompression', W / 2, H - 90);
   await drawHexQR(ctx, shareUrl, W / 2, H - 60, 72);
 }
 
@@ -240,7 +240,7 @@ async function drawXiaohongshuCard(ctx: CanvasRenderingContext2D, W: number, H: 
   // Large portrait as background
   const portraitSrc = op.portrait?.startsWith('skin/')
     ? IMG + op.portrait.replace('#', '%23')
-    : IMG + 'skin/' + op.avatar.replace('#', '%23') + '_2b.jpg';
+    : IMG + 'skin/' + op.avatar.replace('#', '%23') + '_2b.png';
   const portraitImg = await loadImg(portraitSrc);
   if (portraitImg) {
     ctx.save();
@@ -260,14 +260,14 @@ async function drawXiaohongshuCard(ctx: CanvasRenderingContext2D, W: number, H: 
   ctx.textAlign = 'center';
 
   // Avatar (large)
-  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.jpg');
+  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png');
   if (avatarImg) {
     ctx.save(); ctx.beginPath(); ctx.arc(W / 2, 300, 120, 0, Math.PI * 2); ctx.closePath(); ctx.clip();
     ctx.drawImage(avatarImg, W / 2 - 120, 180, 240, 240); ctx.restore();
   }
 
   ctx.fillStyle = '#8A8270'; ctx.font = '22px "Cormorant Garamond", serif';
-  ctx.fillText('罗德岛干员人格测试', W / 2, 440);
+  ctx.fillText('PRTS 源石解压协议', W / 2, 440);
 
   ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 80px "Cormorant Garamond", serif';
   ctx.fillText(op.name, W / 2, 530);
@@ -279,13 +279,13 @@ async function drawXiaohongshuCard(ctx: CanvasRenderingContext2D, W: number, H: 
   ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 100px "Cormorant Garamond", serif';
   ctx.fillText(`${compatible}%`, W / 2, 680);
   ctx.fillStyle = '#8A8270'; ctx.font = '24px "Cormorant Garamond", serif';
-  ctx.fillText('灵魂适配度', W / 2, 720);
+  ctx.fillText('解压契合', W / 2, 720);
 
   // Radar (smaller)
   drawRadar(ctx, W / 2, 880, 130, userCoords, op.coords, op.color);
 
   // Footer
-  ctx.fillText('测测你的干员人格 · 扫码开始', W / 2 - 80, H - 50);
+  ctx.fillText('扫描二维码 · 解压你的源石档案', W / 2 - 80, H - 50);
   await drawHexQR(ctx, shareUrl, W - 130, H - 150, 96);
 }
 
@@ -305,12 +305,12 @@ async function drawBilibiliCard(ctx: CanvasRenderingContext2D, W: number, H: num
   ctx.fillStyle = grad; ctx.fillRect(0, 0, leftW, H);
 
   // Avatar
-  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.jpg');
+  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png');
   if (avatarImg) { ctx.save(); ctx.beginPath(); ctx.arc(centerX, 160, 70, 0, Math.PI * 2); ctx.closePath(); ctx.clip(); ctx.drawImage(avatarImg, centerX - 70, 90, 140, 140); ctx.restore(); }
 
   ctx.textAlign = 'center';
   ctx.fillStyle = '#8A8270'; ctx.font = '14px "Cormorant Garamond", serif';
-  ctx.fillText('罗德岛干员人格测试', centerX, 260);
+  ctx.fillText('PRTS 源石解压协议', centerX, 260);
 
   ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 52px "Cormorant Garamond", serif';
   ctx.fillText(op.name, centerX, 320);
@@ -325,7 +325,7 @@ async function drawBilibiliCard(ctx: CanvasRenderingContext2D, W: number, H: num
   ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 64px "Cormorant Garamond", serif';
   ctx.fillText(`${compatible}%`, centerX, 460);
   ctx.fillStyle = '#8A8270'; ctx.font = '18px "Cormorant Garamond", serif';
-  ctx.fillText('适配度', centerX, 486);
+  ctx.fillText('解压契合度', centerX, 486);
 
   // Tags
   op.tags.slice(0, 3).forEach((tag, i) => {
@@ -354,7 +354,7 @@ async function drawBilibiliCard(ctx: CanvasRenderingContext2D, W: number, H: num
   });
 
   // CTA + QR
-  ctx.fillText('看看你的干员人格 →', rightCX, H - 60);
+  ctx.fillText('查看解压结果 →', rightCX, H - 60);
   await drawHexQR(ctx, shareUrl, W - 80, H - 120, 80);
 }
 
@@ -419,18 +419,28 @@ export async function generateCPCard(
   ctx.fillStyle = '#0D0F11'; ctx.fillRect(0, 0, W, H);
   drawHexBg(ctx, 20, 30);
 
+  // Helper to get portrait URL for canvas
+  const portraitUrl = (op: { portrait?: string; avatar: string }) => {
+    if (op.portrait) {
+      return op.portrait.startsWith('skin/') || op.portrait.startsWith('enemy/')
+        ? IMG + op.portrait.replace('#', '%23')
+        : IMG + 'portrait/' + op.portrait;
+    }
+    return IMG + 'portrait/' + op.avatar.replace('#', '%23') + '.png';
+  };
+
   // Op1 muted portrait (left)
-  const img1 = await loadImg(IMG + 'avatar/' + op1.avatar.replace('#', '%23') + '.jpg');
+  const img1 = await loadImg(portraitUrl(op1));
   if (img1) { ctx.save(); ctx.globalAlpha = 0.18; ctx.drawImage(img1, -150, 50, 600, 600); ctx.restore(); }
 
   // Op2 muted portrait (right)
-  const img2 = await loadImg(IMG + 'avatar/' + op2.avatar.replace('#', '%23') + '.jpg');
+  const img2 = await loadImg(portraitUrl(op2));
   if (img2) { ctx.save(); ctx.globalAlpha = 0.18; ctx.drawImage(img2, W - 450, 50, 600, 600); ctx.restore(); }
 
   // Header
   ctx.textAlign = 'center';
   ctx.fillStyle = '#8A8270'; ctx.font = '22px "Cormorant Garamond", serif';
-  ctx.fillText('罗德岛 · 灵魂共振', W / 2, 70);
+  ctx.fillText('罗德岛 · 协同解压', W / 2, 70);
 
   // Large names
   ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 72px "Cormorant Garamond", serif';
@@ -457,11 +467,11 @@ export async function generateCPCard(
   ctx.fillStyle = '#E8E3D8'; ctx.font = 'bold 96px "Cormorant Garamond", serif';
   ctx.fillText(`${compat}%`, W / 2, 880);
   ctx.fillStyle = '#8A8270'; ctx.font = '26px "Cormorant Garamond", serif';
-  ctx.fillText('灵魂兼容度', W / 2, 920);
+  ctx.fillText('协同指数', W / 2, 920);
 
   // CP line
   ctx.fillStyle = '#B8B0A0'; ctx.font = '22px "Noto Sans SC", sans-serif';
-  const cpText = compat >= 80 ? '你们的灵魂频率在同一波段。' : compat >= 60 ? '截然不同的战场风格，恰好彼此互补。' : '相隔很远的频率，自有引力。';
+  const cpText = compat >= 80 ? '你们的源石档案高度同步——在战场上如同一个人的左右手。' : compat >= 60 ? '截然不同的源石编码，恰好能弥补彼此的盲区。' : '相隔很远的档案，最意外的组合往往最致命。';
   ctx.fillText(cpText, W / 2, 970);
 
   // Hex QR
@@ -470,7 +480,7 @@ export async function generateCPCard(
 
   // Footer
   ctx.fillStyle = '#5A5040'; ctx.font = '14px "Cormorant Garamond", serif';
-  ctx.fillText('扫码开始测试 · R.I. Personality Quiz', W / 2, H - 40);
+  ctx.fillText('扫码开始解压 · PRTS Originium Decompression', W / 2, H - 40);
 
   return canvas.toDataURL('image/jpeg', 0.85);
 }
@@ -538,7 +548,7 @@ export async function generateIdentityArchive(
   ctx.fillText('SECURITY LEVEL: CONFIDENTIAL', W - 40, 55);
 
   // Operator portrait
-  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.jpg');
+  const avatarImg = await loadImg(IMG + 'avatar/' + op.avatar.replace('#', '%23') + '.png');
   if (avatarImg) {
     ctx.save(); ctx.beginPath();
     ctx.arc(W / 2, 220, 100, 0, Math.PI * 2); ctx.closePath(); ctx.clip();

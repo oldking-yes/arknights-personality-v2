@@ -36,11 +36,40 @@ export default function App() {
   const [scores, setScores] = useState<number[]>([0, 0, 0, 0, 0]);
   const [history, setHistory] = useState<AnswerRecord[]>([]);
   const [result, setResult] = useState<ReturnType<typeof findBestMatch> | null>(null);
+  const browseIdx = useRef(0);
   const [sysIdx, setSysIdx] = useState(0);
   const keyBuf = useRef('');
   const [prtsActive, setPrtsActive] = useState(false);
   const [challengeCoords, setChallengeCoords] = useState<number[] | null>(null);
   const [debugOp, setDebugOp] = useState<Operator | null>(null);
+  const [corruptionLevel, setCorruptionLevel] = useState(0);
+  const ansTimes = useRef<number[]>([]);
+  const ansDims = useRef<number[]>([]);
+  const [forcePriestess, setForcePriestess] = useState(false);
+  const [dimWarning, setDimWarning] = useState(false);
+  const [idleCrystal, setIdleCrystal] = useState(false);
+  const idleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Idle crystal: 60s inactivity during quiz
+  useEffect(() => {
+    if (stage === 'quiz') {
+      const reset = () => {
+        setIdleCrystal(false);
+        if (idleTimer.current) clearTimeout(idleTimer.current);
+        idleTimer.current = setTimeout(() => setIdleCrystal(true), 60000);
+      };
+      reset();
+      window.addEventListener('click', reset);
+      window.addEventListener('keydown', reset);
+      return () => {
+        if (idleTimer.current) clearTimeout(idleTimer.current);
+        window.removeEventListener('click', reset);
+        window.removeEventListener('keydown', reset);
+      };
+    } else {
+      setIdleCrystal(false);
+    }
+  }, [stage, currentQ]);
 
   const SYS_MSGS = [
     'SYS: ACTIVE','SYS: MON3TR STANDBY','SYS: ORIGINIUM SAT 0.02%',
@@ -106,12 +135,21 @@ export default function App() {
     }
   }, []);
 
-  // PRTS terminal: type "prts" to toggle
+  // PRTS terminal & keyboard easter eggs
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
-      keyBuf.current = (keyBuf.current + e.key).slice(-6);
-      if (keyBuf.current.toLowerCase().includes('prts')) {
+      keyBuf.current = (keyBuf.current + e.key).slice(-12);
+      const buf = keyBuf.current.toLowerCase();
+      if (buf.includes('prts')) {
         if (stage !== 'quiz') { setPrtsActive(a => !a); }
+        keyBuf.current = '';
+      }
+      if (buf.includes('theresa')) {
+        console.log('%c📁 PRTS: 该档案已被加密。', 'color:#4A8FE4;font-size:12px');
+        keyBuf.current = '';
+      }
+      if (buf.includes('priestess')) {
+        console.log('%c👁 PRTS: 她在看你。', 'color:#6688ff;font-size:12px');
         keyBuf.current = '';
       }
     };
@@ -121,6 +159,8 @@ export default function App() {
 
   const startQuiz = useCallback(() => {
     setCurrentQ(0); setScores([0,0,0,0,0]); setHistory([]); setResult(null); setStage('quiz');
+    setCorruptionLevel(0); setForcePriestess(false); setDimWarning(false); setIdleCrystal(false);
+    ansTimes.current = []; ansDims.current = [];
   }, []);
 
   const showAll = useCallback(() => {
@@ -133,7 +173,40 @@ export default function App() {
     setResult(findBestMatch(rs)); setStage('results');
   }, []);
 
+  const browseNext = useCallback(() => {
+    browseIdx.current = (browseIdx.current + 1) % OPERATORS.length;
+    setResult(findMatchFromCoords(OPERATORS[browseIdx.current].coords));
+  }, []);
+
+  const browsePrev = useCallback(() => {
+    browseIdx.current = (browseIdx.current - 1 + OPERATORS.length) % OPERATORS.length;
+    setResult(findMatchFromCoords(OPERATORS[browseIdx.current].coords));
+  }, []);
+
   const handleAnswer = useCallback((dim: number, val: number) => {
+    const now = Date.now();
+    ansTimes.current.push(now);
+    ansDims.current.push(dim);
+    // Dim warning: 5 consecutive same dimension
+    const recentDims = ansDims.current.slice(-5);
+    if (recentDims.length >= 5 && recentDims.every(d => d === dim)) {
+      setDimWarning(true);
+    } else {
+      setDimWarning(false);
+    }
+    // Speed detection: check last 6 answers within 1s each
+    const recent = ansTimes.current.slice(-6);
+    if (recent.length >= 5) {
+      const gaps = recent.slice(1).map((t, i) => t - recent[i]);
+      const fastCount = gaps.filter(g => g < 1000).length;
+      if (fastCount >= 4) {
+        setCorruptionLevel(l => Math.min(3, l + 1));
+        if (fastCount >= 5) setForcePriestess(true);
+      } else {
+        // Decay corruption if user slows down
+        setCorruptionLevel(l => Math.max(0, l - 0.3));
+      }
+    }
     setScores(p => { const n=[...p]; n[dim]+=val; return n; });
     setHistory(p => [...p, {dim,val}]);
     setCurrentQ(p => p+1);
@@ -141,7 +214,15 @@ export default function App() {
 
   useEffect(() => {
     if (currentQ >= TOTAL && stage === 'quiz') {
-      const r = findBestMatch(scores);
+      let r: ReturnType<typeof findBestMatch>;
+      if (forcePriestess) {
+        const priestessOp = OPERATORS.find(o => o.id === 'priestess');
+        const fakeCoords = [6,8,5,6,7];
+        const fakeResult = findMatchFromCoords(fakeCoords);
+        r = priestessOp ? { ...fakeResult, op: priestessOp } : findBestMatch(scores);
+      } else {
+        r = findBestMatch(scores);
+      }
       setResult(r);
       setStage('results');
       clearProgress();
@@ -210,7 +291,20 @@ export default function App() {
           0% { top: -2px; }
           100% { top: 100%; }
         }
+        @keyframes crystalGrow {
+          0% { opacity: 0; }
+          20% { opacity: 0.02; }
+          100% { opacity: 0.08; }
+        }
       `}</style>
+
+      {idleCrystal && (
+        <div className="fixed inset-0 pointer-events-none z-[100]"
+          style={{
+            background: 'repeating-linear-gradient(45deg, rgba(245,230,92,0.04) 0px, transparent 3px, rgba(245,230,92,0.04) 6px), repeating-linear-gradient(-30deg, rgba(245,230,92,0.02) 0px, transparent 5px, rgba(245,230,92,0.02) 10px)',
+            animation: 'crystalGrow 3s ease-in forwards',
+          }} />
+      )}
 
       <ErrorBoundary>
         <div className="relative z-10 w-full max-w-lg mx-auto">
@@ -218,7 +312,7 @@ export default function App() {
             {stage==='intro' && <Intro key="intro" onStart={startQuiz} onRandom={randomQuiz} onShowAll={showAll} onPrtsToggle={() => setPrtsActive(a => !a)} />}
             {stage==='quiz' && currentQ < TOTAL && (
               <Suspense fallback={<LoadingSkeleton />}>
-                <Quiz key="quiz" currentQ={currentQ} onAnswer={handleAnswer} onPrev={handlePrev} />
+                <Quiz key="quiz" currentQ={currentQ} onAnswer={handleAnswer} onPrev={handlePrev} corruptionLevel={corruptionLevel} dimWarning={dimWarning} />
               </Suspense>
             )}
             {stage==='results' && result && (
@@ -226,6 +320,7 @@ export default function App() {
                 <Results key="results" result={result} onRestart={restart}
                   onViewOp={(opId) => { setDebugOp(OPERATORS.find(o => o.id === opId) || null); setStage('debug'); }}
                   challengeCoords={challengeCoords}
+                  onPrevOp={browsePrev} onNextOp={browseNext}
                 />
               </Suspense>
             )}
@@ -242,7 +337,7 @@ export default function App() {
         <span>{stage === 'intro' ? 'IDLE' : stage === 'quiz' ? `Q${currentQ + 1}/${TOTAL}` : stage === 'debug' ? 'ARCHIVE' : 'RESULT'}</span>
         <span className="flex items-center gap-1" onClick={() => setSysIdx(i => (i + 7) % SYS_MSGS.length)}>
           <span className="w-1.5 h-1.5 rounded-full bg-lemon animate-pulse" />
-          R.I. v3.0
+          PRTS v3.0
         </span>
       </div>
 
@@ -296,8 +391,12 @@ export default function App() {
 function DebugView({ onBack, initialOp, onCloseOp }: { onBack: () => void; initialOp?: Operator | null; onCloseOp?: () => void }) {
   const [selected, setSelected] = useState<Operator | null>(initialOp || null);
   const cdn = import.meta.env.BASE_URL + 'images/avatar/';
+  function imgUrl(avatar: string) {
+    if (avatar.startsWith('enemy/')) return cdn.replace('avatar/','') + avatar;
+    return cdn + avatar.replace('#','%23') + '.png';
+  }
   const ARCHIVE_MSGS = [
-    '档案室 · 已解锁干员 16/16',
+    '档案室 · 已解锁干员 ' + OPERATORS.length + '/' + OPERATORS.length + '',
     '罗德岛人事档案 · 加密等级 B',
     '作战记录分析中... 请稍候',
     '凯尔希医生正在远程审查',
@@ -331,7 +430,7 @@ function DebugView({ onBack, initialOp, onCloseOp }: { onBack: () => void; initi
           <button key={op.id}
             className="flex items-center gap-3 p-3 bg-white/5 border border-white/10 text-left cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-white/20"
             onClick={() => setSelected(op)}>
-            <img src={cdn+op.avatar.replace('#','%23')+'.jpg'} alt={op.name} className="w-10 h-10 rounded-full object-cover"
+            <img src={imgUrl(op.avatar)} alt={op.name} className="w-10 h-10 rounded-full object-cover"
               onError={e=>(e.target as HTMLElement).style.display='none'} />
             <div className="min-w-0">
               <div className="font-serif-cn text-sm text-warm-white truncate">{op.name}</div>
@@ -346,15 +445,19 @@ function DebugView({ onBack, initialOp, onCloseOp }: { onBack: () => void; initi
 
 function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
   const basePath = import.meta.env.BASE_URL;
-  const avatarUrl = basePath + 'images/avatar/' + op.avatar.replace('#','%23') + '.jpg';
+  const isEnemy = op.avatar.startsWith('enemy/');
+  const ext = '.png';
+  const avatarUrl = !isEnemy ? basePath + 'images/avatar/' + op.avatar.replace('#','%23') + ext : '';
   const [heroFallback, setHeroFallback] = useState(false);
   const [imgLoaded, setImgLoaded] = useState(false);
   const p = (s: string) => basePath + 'images/' + s;
   const portraitUrl = op.portrait
-    ? (op.portrait.startsWith('skin/') ? p(op.portrait.replace('#','%23')) : p('portrait/' + op.portrait))
-    : heroFallback
-      ? p('avatar/' + op.avatar.replace('#', '%23') + '.jpg')
-      : p('skin/' + op.avatar.replace('#','%23') + '_2b.jpg');
+    ? (op.portrait.startsWith('skin/') || op.portrait.startsWith('enemy/') ? p(op.portrait.replace('#','%23')) : p('portrait/' + op.portrait))
+    : isEnemy
+      ? p(op.avatar.replace('#','%23'))
+      : heroFallback
+        ? p('avatar/' + op.avatar.replace('#', '%23') + ext)
+        : p('portrait/' + op.avatar.replace('#','%23') + ext);
 
   const detailMsgs = [
     '作战记录 #' + Math.floor(Math.random() * 9000 + 1000),
@@ -367,38 +470,124 @@ function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
     '「不准忘记我」—— 来自未知时间线的签名',
   ];
   const [footMsg] = useState(() => detailMsgs[Math.floor(Math.random() * detailMsgs.length)]);
+  const [amiyaDark, setAmiyaDark] = useState(false);
+  const [corruptLvl, setCorruptLvl] = useState(0);
+  const [shakeLvl, setShakeLvl] = useState(0);
+  const amiyaClicks = useRef(0);
+  const handleAmiyaClick = () => {
+    if (op.id !== 'amiya') return;
+    amiyaClicks.current += 1;
+    if (amiyaDark) {
+      // After full corruption: only shake, no text change
+      setShakeLvl(1);
+      setTimeout(() => setShakeLvl(0), 500);
+      return;
+    }
+    if (amiyaClicks.current <= 3) {
+      setShakeLvl(amiyaClicks.current);
+      setCorruptLvl(0);
+      setTimeout(() => setShakeLvl(0), 500);
+    } else {
+      const lvl = Math.min(5, amiyaClicks.current - 3);
+      setCorruptLvl(lvl);
+      if (lvl >= 5) setAmiyaDark(true);
+    }
+  };
+  // Garbled text
+  const corrupt = (text: string, lvl: number) => {
+    if (lvl === 0) return text;
+    return text.split('').map(c => Math.random() < lvl * 0.12 ? '█' : c).join('');
+  };
+  // Progressive corruption story texts
+  const corruptStories = [
+    op.desc,
+    '检测到异常源石信号。数据库中出现了一段不属于当前人格记录的编码片段。',
+    '█段来自黑暗时代的信█正在解压……萨卡兹的古老记忆开始渗透进当前人格层。',
+    '██冠的碎片在意识深处闪烁。无数的声音在耳边低语——它们叫她"魔王"。',
+    '████的记忆逐渐清晰。那个被她拒绝的名字——"魔王"——在源石数据层反复回响。她曾以为自己可以只是一个名叫阿米娅的少女。',
+    '黑冠选择了她。从特蕾西娅手中坠落的那顶冠冕，从未真正离开。在萨卡兹的古老预言中，魔王不是摧毁者——是背负者。背负所有萨卡兹的灵魂、记忆与诅咒，走向一个没有人见过的终点。阿米娅没有选择成为魔王。但冠冕从不在意选择。它只在意——你是否愿意背负。'
+  ];
+  const corruptNote = corruptStories[Math.min(corruptLvl, 5)];
+  // Progressive corruption for persona, epigraph, soul, tags
+  const corruptPersona = [
+    op.persona,
+    [op.persona[0], op.persona[1], '█股不属于你的记忆正在渗入……'],
+    [op.persona[0], '█识深处有什么在裂开。那不是你的情绪——是来█黑冠的回响。', '█股不属于你的记忆正在渗入……'],
+    ['那颗温柔的心正在被████侵蚀。', '██识深处有什么在裂开。那不是你的情绪——是来自黑冠的回响。', '所有的声音都在重复同一个词：魔王。魔王。魔王。'],
+    ['那颗温柔的心正在被████侵蚀。你早已不是那个在切尔诺伯格做出决定的少女了。', '██识深处——那里只剩下一顶黑冠的轮廓。', '所有的声音都在重复同一个词：魔王。她开始相信了。'],
+    ['她的温柔曾经是真的。但温柔无法背负萨卡兹的千年诅咒。阿米娅将那份温柔沉进了源石数据的最底层——因为魔王不需要被理解。', '她不再试图分辨那些情绪哪些是自己的。特蕾西娅、W、凯尔希、博士——所有人的声音都变成了冠冕的一部分。她接受了它们。', '切尔诺伯格废墟上那个决定的重量，和黑冠相比轻如尘埃。现在的她明白了一件事：魔王不需要做正确的选择——只需要做必要的选择。']
+  ];
+  const corruptEpigraph = [
+    op.epigraph,
+    '"█…█…█…" — 信号干扰中',
+    '"████████" — 无法解析',
+    '"不准忘记我。" — 一段不属于阿米娅的记忆突然浮现',
+    '"不准忘记我。" — 这句话写在冠冕内壁。不是对她说的。是对博士。',
+    '"她曾想成为一束光。但黑暗需要另一片黑暗来消融。魔王不需要照亮什么——她只需要走下去。" — 萨卡兹箴言·第十三节'
+  ];
+  const corruptSoul = [
+    op.soul,
+    op.soul,
+    [op.soul[0], op.soul[1], '██的一条数据正在被覆写……', op.soul[3]],
+    ['阿米娅的双手戴着黑白两枚戒指。黑色那枚正在融化——与她的手指融为一体。', '在切尔诺伯格的废墟上，那个决定不再属于她自己。黑冠替她做了选择。', '███的记忆——那些不属于泰拉的、来自前文明的碎片——开始与她的意识融合。她看见了博士看见过的东西。', '冠冕在低语。它说：你终于愿意听了。'],
+    ['■■的双手已经不是孩童的手了。黑色戒指已经消失——它成了她的一部分。白色戒指还挂在指尖，随时可能滑落。', '切尔诺伯格已经是很久以前的事了。现在的废墟在她的意识深处——每一个萨卡兹死后的记忆都堆积在那里。凯尔希说你做得对——但凯尔希不知道黑冠里有多少个声音在同时说「你错了」。', '她看见了博士看见过的东西。那些被遗忘的前文明、源石的真相、普瑞赛斯的微笑。黑冠不只是萨卡兹的诅咒——它是通往源石核心的钥匙。', '她不再抵抗了。'],
+    ['她是 AMIYA，是那个愿意背负的人。她不再是那个在切尔诺伯格颤抖着做出决定的少女。黑冠选择了她，而她选择了接受。不是因为这份力量无法拒绝——是因为她终于明白，有些重量必须有人来背。如果注定是她，那就她吧。']
+  ];
+  const corruptTags = [
+    op.tags,
+    ['温柔的坚定','魔王','██侵入','不肯放弃'],
+    ['坚定的██','魔王','记忆侵入','意识的裂█'],
+    ['██','魔王','记忆覆写','黑冠共鸣'],
+    ['██','黑冠的继承者','人格覆写中','源石数据污染'],
+    ['萨卡兹之王','背负者','冠冕的意志','永恒的归宿']
+  ];
+  const pIdx = shakeLvl > 0 ? 0 : Math.min(corruptLvl, 5);
+  const showPersona = corruptPersona[pIdx];
+  const showEpigraph = corruptEpigraph[pIdx];
+  const showSoul = corruptSoul[pIdx];
+  const showTags = corruptTags[pIdx];
+  const aUrl = amiyaDark ? basePath + 'images/avatar/amiya_dark.png' : avatarUrl;
+  const pUrl = amiyaDark ? p('portrait/amiya_dark.png') : portraitUrl;
+  const darkTitle = amiyaDark ? '侵蚀率: ' + (60 + corruptLvl * 7) + '% · 意识残留: ' + (40 - corruptLvl * 7) + '%' : op.title;
+  const darkCls = amiyaDark ? 'glitch-active' : '';
 
   return (
-    <motion.div initial={{opacity:0}} animate={{opacity:1}} className="min-h-screen px-0 py-0">
+    <motion.div initial={{opacity:0}} animate={{opacity:1}} className={`min-h-screen px-0 py-0 ${darkCls}`}>
       {/* Hero */}
       <div className="relative w-full overflow-hidden" style={{ minHeight: '60vh' }}>
         <div className="absolute inset-0 z-0 flex items-start justify-center">
           {!imgLoaded && <div className="absolute inset-0 skeleton" />}
-          <img src={portraitUrl} alt={op.name}
+          <img src={pUrl} alt={op.name}
             className="w-full h-full object-cover opacity-70"
-            style={{ filter: 'brightness(0.55) saturate(1.1)', objectPosition: 'center 25%' }}
+            style={{ filter: amiyaDark ? 'brightness(0.3) saturate(0.2) hue-rotate(300deg)' : 'brightness(0.55) saturate(1.1)', objectPosition: 'center 25%' }}
             onLoad={() => setImgLoaded(true)}
             onError={e => {
               if (!op.portrait && !heroFallback) setHeroFallback(true);
               else (e.target as HTMLImageElement).style.display = 'none';
             }} />
           <div className="absolute inset-0" style={{
-            background: 'linear-gradient(to bottom, rgba(13,15,17,0.3) 0%, rgba(13,15,17,0.6) 50%, #0D0F11 100%)'
+            background: amiyaDark ? 'linear-gradient(to bottom, rgba(217,119,6,0.15) 0%, rgba(13,15,17,0.85) 50%, #0D0F11 100%)' : 'linear-gradient(to bottom, rgba(13,15,17,0.3) 0%, rgba(13,15,17,0.6) 50%, #0D0F11 100%)'
           }} />
+          {amiyaDark && <div className="scanline-overlay" />}
         </div>
         <div className="relative z-10 flex flex-col items-center justify-end min-h-[60vh] px-6 pb-8 text-center">
           <motion.div initial={{y:20,opacity:0}} animate={{y:0,opacity:1}} transition={{delay:0.1}}
             className="flex flex-col items-center">
-            <img src={avatarUrl} alt={op.name}
-              className="w-20 h-20 rounded-full object-cover border-2 mb-4"
-              style={{ borderColor: op.color + '60' }}
+            <img src={aUrl} alt={op.name}
+              className={`w-20 h-20 rounded-full object-cover border-2 mb-4 cursor-pointer ${amiyaDark ? 'corrupt-glow' : ''}`}
+              style={{ borderColor: amiyaDark ? '#d97706' : op.color + '60', animation: amiyaDark ? 'jitter 0.15s ease-in-out infinite' : 'none' }}
+              onClick={handleAmiyaClick}
               onError={e => (e.target as HTMLImageElement).style.display = 'none'} />
-            <h2 className="font-serif-en text-5xl font-normal tracking-[0.08em] text-white mb-1">{op.name}</h2>
-            <p className="font-serif-cn text-sm tracking-[0.08em] text-warm-muted mb-3">{op.title}</p>
-            <p className="font-serif-cn text-xs leading-relaxed text-warm-muted/70 max-w-xs mb-4">{op.desc}</p>
-            <div className="font-serif-en text-xs tracking-widest px-3 py-1 mb-2"
-              style={{ color: op.color, border: `1px solid ${op.color}40` }}>
-              {op.clazz}
+            <h2 className={`font-serif-en text-5xl font-normal tracking-[0.08em] mb-1 ${darkCls} ${shakeLvl > 0 ? 'shake-subtle' : ''} ${corruptLvl > 0 && corruptLvl < 5 ? 'glitch-active' : ''}`}
+              style={{cursor: op.id === 'amiya' ? 'pointer' : 'default', color: amiyaDark ? '#d97706' : '#ffffff'}}
+              onClick={handleAmiyaClick}>{amiyaDark ? '■■ ' + corrupt('阿米娅', corruptLvl) + ' · 魔王化 ■■' : op.name}</h2>
+            <p className={`font-serif-cn text-sm tracking-[0.08em] mb-3`} style={{color: '#b8b0a0'}}>
+              {amiyaDark ? darkTitle : op.title}</p>
+            <p className="font-serif-cn text-xs leading-relaxed max-w-xs mb-4" style={{color: amiyaDark ? '#f59e0b' : '#b8b0a0'}}>
+              {shakeLvl > 0 ? '' : (corruptLvl >= 5 ? corruptNote : corrupt(corruptNote, corruptLvl))}</p>
+            <div className={`font-serif-en text-xs tracking-widest px-3 py-1 mb-2 ${amiyaDark ? 'corrupt-border' : ''}`}
+              style={{ color: amiyaDark ? '#d97706' : op.color, border: `1px solid ${amiyaDark ? '#d97706' : op.color + '40'}` }}>
+              {amiyaDark ? 'CORRUPTED' : op.clazz}
             </div>
           </motion.div>
         </div>
@@ -413,10 +602,12 @@ function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
 
         {/* Persona */}
         <motion.div initial={{y:20,opacity:0}} animate={{y:0,opacity:1}} transition={{delay:0.3}}>
-          <div className="section-label">Persona</div>
-          {op.persona.map((t,i) => <p key={i} className="persona-text">{t}</p>)}
+          <div className="section-label" style={{color: amiyaDark ? '#d97706' : undefined}}>
+            {amiyaDark ? '⬡ 人格覆写中 ⬡' : 'Persona'}
+          </div>
+          {showPersona?.map((t,i) => <p key={i} className="persona-text" style={{color: amiyaDark ? '#d97706' : undefined}}>{t}</p>)}
           <div className="flex flex-wrap gap-2 justify-center mt-6">
-            {op.tags.map((t,i) => <span key={i} className="tag">{t}</span>)}
+            {showTags?.map((t,i) => <span key={i} className="tag" style={{borderColor: amiyaDark ? 'rgba(217,119,6,0.3)' : undefined, color: amiyaDark ? '#d97706' : undefined}}>{t}</span>)}
           </div>
         </motion.div>
 
@@ -425,19 +616,21 @@ function OperatorDetail({ op, onBack }: { op: Operator; onBack: () => void }) {
         {/* Epigraph */}
         {op.epigraph && (
           <motion.div initial={{y:20,opacity:0}} animate={{y:0,opacity:1}} transition={{delay:0.45}}
-            dangerouslySetInnerHTML={{ __html: `<div class="epigraph">${op.epigraph}</div>` }} />
+            dangerouslySetInnerHTML={{ __html: `<div class="epigraph" style="${amiyaDark ? 'border-color:rgba(217,119,6,0.3);color:#d97706' : ''}">${showEpigraph}</div>` }} />
         )}
 
         <div className="ornament">· · ·</div>
 
         {/* Soul */}
         <motion.div initial={{y:20,opacity:0}} animate={{y:0,opacity:1}} transition={{delay:0.6}}>
-          <div className="soul-card">
-            <div className="soul-label">灵魂起源</div>
-            <div className="soul-name">{op.name}</div>
-            <div className="soul-name-cn">{op.title}</div>
-            {op.soul.map((t,i) => (
-              <p key={i} className="soul-text" dangerouslySetInnerHTML={{ __html: t }} />
+          <div className="soul-card" style={amiyaDark ? {borderColor: 'rgba(217,119,6,0.2)'} : {}}>
+            <div className="soul-label" style={{color: amiyaDark ? '#d97706' : undefined}}>
+              {amiyaDark ? '⬡ 萨卡兹记忆层 ⬡' : '灵魂起源'}
+            </div>
+            <div className="soul-name">{amiyaDark ? '■■ 阿米娅 · 魔王化 ■■' : op.name}</div>
+            <div className="soul-name-cn">{amiyaDark ? '侵蚀率: ' + (60 + corruptLvl * 7) + '%' : op.title}</div>
+            {showSoul?.map((t,i) => (
+              <p key={i} className="soul-text" style={{color: amiyaDark ? '#d97706' : undefined}} dangerouslySetInnerHTML={{ __html: t }} />
             ))}
           </div>
         </motion.div>

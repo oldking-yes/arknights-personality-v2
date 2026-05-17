@@ -1,40 +1,40 @@
 {
   "intro": {
-    "subtitle": "— a personality map of Rhodes Island —",
-    "title": "R.I.",
-    "heading": "罗德岛干员人格测试",
-    "desc1": "战场上的选择，照见你灵魂的形状。",
-    "desc2": "十五道战术情境题，<0>找到与你的频率共振的那位干员。</0>",
-    "meta": "16 operators · 15 questions · 3 min",
-    "start": "开 始 测 试",
-    "tip": "请在安静的时刻打开",
-    "random": "⚡ 直接看结果",
-    "debug": "DEBUG · 全部干员"
+    "subtitle": "— originium decompression protocol —",
+    "title": "ORIGINIUM",
+    "heading": "源石计划 · Assimilated Universe",
+    "desc1": "源石计划将一个内化宇宙折叠进晶体深处。一段信号在其中穿行了一万三千年——",
+    "desc2": "穿过每一次天灾、每一场战争、每一个文明的终焉。从未衰减。从未被回应。",
+    "meta": "32 operators · 20 questions · 5 min",
+    "start": "启 动 协 议",
+    "tip": "████ · 信号稳定 · 终端待命",
+    "random": "⚡ 跳过协议 · 随机解压",
+    "debug": "DEBUG · 全部档案"
   },
   "quiz": {
-    "header": "TACTICAL ASSESSMENT",
+    "header": "PRTS 源石解压中 · 协议运行中",
     "progress": "Q{current}/{total}",
-    "hint": "[1–4] SELECT · [BKSP] RETURN"
+    "hint": "[1–4] SELECT · [BKSP] BACK"
   },
   "results": {
-    "subtitle": "与你灵魂共振的干员",
-    "compatibility": "适配度",
-    "soulLabel": "灵魂起源",
-    "personaLabel": "人格速写",
-    "tags": "标签",
-    "dimensionLabel": "维度对比",
-    "matchRanking": "你的匹配排行",
-    "topMatches": "你的 Top 3 干员匹配",
+    "subtitle": "PRTS 源石解压结果",
+    "compatibility": "解压契合度",
+    "soulLabel": "源石压缩档案",
+    "personaLabel": "战术人格图谱",
+    "tags": "特征标签",
+    "dimensionLabel": "五维对比",
+    "matchRanking": "匹配排行",
+    "topMatches": "其他解压结果",
     "actions": {
-      "shareCard": "生成分享卡片",
-      "share": "分享给好友",
-      "restart": "重新测试",
+      "shareCard": "生成解压报告",
+      "share": "分享解压结果",
+      "restart": "重新解压",
       "download": "保存图片",
       "copyLink": "复制链接",
-      "copyText": "复制分享文案",
+      "copyText": "复制报告文案",
       "challenge": "挑战朋友",
-      "identityArchive": "生成身份档案",
-      "cpCard": "生成 CP 卡片"
+      "identityArchive": "生成人员档案",
+      "cpCard": "生成协同解压报告"
     },
     "wechat": {
       "share": "微信分享 · 点击复制",
@@ -42,20 +42,20 @@
       "modalHint": "长按图片保存，或点击右上角 ··· 分享给朋友"
     },
     "compatLevel": {
-      "soul": "灵魂共振",
-      "deep": "深度匹配",
-      "surprise": "意外匹配"
+      "soul": "深度共鸣",
+      "deep": "高度契合",
+      "surprise": "意外共振"
     },
-    "shareModal": "分享卡片",
+    "shareModal": "解压报告",
     "switchFormat": "切换格式"
   },
   "compare": {
-    "title": "罗德岛人格兼容度",
-    "compatPercent": "兼容度",
-    "cpText_high": "你们的灵魂频率在同一波段。",
-    "cpText_mid": "你们有截然不同的战场风格，却恰好互补。",
-    "cpText_low": "你们的频率相隔很远，但这未必不是一种吸引。",
-    "challengeHint": "我测出来是{op}，你也来测测？"
+    "title": "PRTS 协同解压分析",
+    "compatPercent": "共鸣指数",
+    "cpText_high": "你们的源石编码高度同步——在战场上如同一个人的左右手。",
+    "cpText_mid": "截然不同的编码模式，恰好能弥补彼此的盲区。",
+    "cpText_low": "你们的源石编码相隔很远，但 PRTS 记录中最致命的组合往往来自最意外的匹配。",
+    "challengeHint": "PRTS 解压协议匹配了{op}，你也来试试？"
   },
   "identityArchive": {
     "title": "罗德岛 · 人员档案",

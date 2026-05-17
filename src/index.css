@@ -31,7 +31,7 @@
 
 @layer base {
   body {
-    font-family: var(--font-serif-cn);
+    font-family: var(--font-sans);
     background: #0D0F11;
     color: var(--color-warm-white);
     margin: 0;
@@ -405,4 +405,143 @@
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;
   }
+}
+
+/* === Originium Corruption Animations === */
+@keyframes corruptGlow {
+  0%, 100% { opacity: 0.3; filter: drop-shadow(0 0 4px rgba(217,119,6,0.3)); }
+  25% { opacity: 0.6; filter: drop-shadow(0 0 12px rgba(217,119,6,0.5)); }
+  50% { opacity: 0.4; filter: drop-shadow(0 0 6px rgba(245,230,92,0.3)); }
+  75% { opacity: 0.7; filter: drop-shadow(0 0 16px rgba(217,119,6,0.6)); }
+}
+.corrupt-glow {
+  animation: corruptGlow 2s ease-in-out infinite;
+}
+
+@keyframes corruptPulse {
+  0%, 100% { opacity: 0.08; transform: scale(1); }
+  50% { opacity: 0.03; transform: scale(1.02); }
+}
+.corrupt-pulse {
+  animation: corruptPulse 3s ease-in-out infinite;
+}
+
+@keyframes glitchText {
+  0% { transform: translate(0); filter: none; }
+  10% { transform: translate(-1px, 1px); filter: hue-rotate(10deg); }
+  20% { transform: translate(1px, -1px); filter: hue-rotate(-5deg); }
+  30% { transform: translate(-1px, -1px); filter: hue-rotate(15deg); }
+  40% { transform: translate(1px, 1px); filter: none; }
+  50% { transform: translate(0, 0); filter: hue-rotate(-10deg); }
+  100% { transform: translate(0); filter: none; }
+}
+.glitch-text {
+  animation: glitchText 0.4s ease-in-out infinite;
+}
+
+@keyframes scanlineMove {
+  0% { transform: translateY(-100%); }
+  100% { transform: translateY(100vh); }
+}
+.scanline-overlay::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 9997;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 3px,
+    rgba(217, 119, 6, 0.03) 3px,
+    rgba(217, 119, 6, 0.03) 4px
+  );
+  pointer-events: none;
+}
+
+@keyframes staticNoise {
+  0%, 100% { opacity: 0; }
+  10% { opacity: 0.04; }
+  20% { opacity: 0; }
+  40% { opacity: 0.03; }
+  70% { opacity: 0; }
+  85% { opacity: 0.05; }
+  95% { opacity: 0; }
+}
+.static-noise {
+  animation: staticNoise 5s step-end infinite;
+}
+
+@keyframes borderFlicker {
+  0%, 100% { border-color: rgba(217,119,6,0.2); }
+  25% { border-color: rgba(217,119,6,0.5); }
+  50% { border-color: rgba(245,230,92,0.3); }
+  75% { border-color: rgba(217,119,6,0.6); }
+}
+.corrupt-border {
+  animation: borderFlicker 1.5s ease-in-out infinite;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-3px); }
+  50% { transform: translateX(3px); }
+  75% { transform: translateX(-1px); }
+}
+.shake {
+  animation: shake 0.3s ease-in-out;
+}
+
+@keyframes shakeSubtle {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-2px); }
+  50% { transform: translateX(2px); }
+  75% { transform: translateX(-1px); }
+}
+.shake-subtle {
+  animation: shakeSubtle 0.25s ease-in-out;
+}
+
+@keyframes shakeWarn {
+  0%, 100% { opacity: 1; }
+  25% { opacity: 0.4; }
+  50% { opacity: 1; }
+  75% { opacity: 0.5; }
+}
+.shake-warn {
+  animation: shake 0.5s ease-in-out, shakeWarn 0.5s ease-in-out;
+}
+
+@keyframes clickPulse {
+  0% { box-shadow: 0 0 0 0 rgba(217,119,6,0.4); }
+  100% { box-shadow: 0 0 0 12px rgba(217,119,6,0); }
+}
+.click-pulse {
+  animation: clickPulse 0.6s ease-out;
+}
+
+@keyframes floatText {
+  0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
+  10% { opacity: 0.5; }
+  90% { opacity: 0.3; }
+  100% { transform: translateY(-10vh) rotate(360deg); opacity: 0; }
+}
+.float-text {
+  position: fixed;
+  pointer-events: none;
+  z-index: 10000;
+  font-family: 'Cormorant Garamond', serif;
+  animation: floatText 12s linear forwards;
+}
+
+@keyframes scaryPulse {
+  0% { opacity: 0; transform: scale(0.9); }
+  5% { opacity: 1; transform: scale(1.05); }
+  10% { transform: scale(0.98); }
+  15% { transform: scale(1.02); }
+  20% { opacity: 1; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+.scary-img-once {
+  animation: scaryPulse 3s ease-out forwards;
+  filter: brightness(0.6) saturate(1.5) contrast(1.2);
 }

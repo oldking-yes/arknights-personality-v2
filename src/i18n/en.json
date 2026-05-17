@@ -1,40 +1,40 @@
 {
   "intro": {
-    "subtitle": "— a personality map of Rhodes Island —",
-    "title": "R.I.",
-    "heading": "R.I. Operator Personality Quiz",
-    "desc1": "Choices made on the battlefield mirror the shape of your soul.",
-    "desc2": "15 tactical scenarios to <0>find the operator whose frequency resonates with yours.</0>",
-    "meta": "16 operators · 15 questions · 3 min",
-    "start": "BEGIN TEST",
-    "tip": "Best taken in a quiet moment",
-    "random": "⚡ Skip to Result",
-    "debug": "DEBUG · All Operators"
+    "subtitle": "— originium decompression protocol —",
+    "title": "ORIGINIUM",
+    "heading": "Originium Decompression",
+    "desc1": "The Originium Project folded an Assimilated Universe into the crystal.",
+    "desc2": "A signal has been traveling through its lattice for 13,000 years—through every Catastrophe, every war, the end of every civilization. Never faded. Never answered.",
+    "meta": "32 operators · 20 questions · 5 min",
+    "start": "BEGIN PROTOCOL",
+    "tip": "PRTS has been waiting 13,000 years for your input",
+    "random": "⚡ Skip Protocol · Random Extract",
+    "debug": "DEBUG · All Archives"
   },
   "quiz": {
-    "header": "TACTICAL ASSESSMENT",
+    "header": "PRTS DECOMPRESSION IN PROGRESS",
     "progress": "Q{current}/{total}",
     "hint": "[1–4] SELECT · [BKSP] BACK"
   },
   "results": {
-    "subtitle": "Your Resonant Operator",
-    "compatibility": "Compatibility",
-    "soulLabel": "Origin Story",
-    "personaLabel": "Persona",
+    "subtitle": "PRTS Originium Decompression Result",
+    "compatibility": "Decompression Match",
+    "soulLabel": "Originium Archive",
+    "personaLabel": "Tactical Profile",
     "tags": "Traits",
     "dimensionLabel": "Dimension Comparison",
-    "matchRanking": "Your Match Ranking",
-    "topMatches": "Your Top 3 Matches",
+    "matchRanking": "Match Ranking",
+    "topMatches": "Other Decompression Results",
     "actions": {
-      "shareCard": "Generate Share Card",
-      "share": "Share with Friend",
-      "restart": "Retake Test",
+      "shareCard": "Generate Decompression Report",
+      "share": "Share Result",
+      "restart": "Restart Protocol",
       "download": "Save Image",
       "copyLink": "Copy Link",
-      "copyText": "Copy Text",
+      "copyText": "Copy Report Text",
       "challenge": "Challenge a Friend",
-      "identityArchive": "Generate Archive",
-      "cpCard": "Generate CP Card"
+      "identityArchive": "Generate Dossier",
+      "cpCard": "Generate Sync Decompression Report"
     },
     "wechat": {
       "share": "Share via WeChat · Copy Link",
@@ -42,23 +42,23 @@
       "modalHint": "Long-press to save, or tap ··· in the top right to share"
     },
     "compatLevel": {
-      "soul": "Soul Resonance",
-      "deep": "Deep Match",
-      "surprise": "Surprising Match"
+      "soul": "Deep Resonance",
+      "deep": "High Compatibility",
+      "surprise": "Unexpected Resonance"
     },
-    "shareModal": "Share Card",
+    "shareModal": "Decompression Report",
     "switchFormat": "Change Format"
   },
   "compare": {
-    "title": "R.I. Personality Compatibility",
-    "compatPercent": "Compatibility",
-    "cpText_high": "Your frequencies hum on the same wavelength.",
-    "cpText_mid": "Your battlefield styles are worlds apart — yet perfectly complementary.",
-    "cpText_low": "Your frequencies are distant, but that may be its own kind of gravity.",
-    "challengeHint": "I matched with {op}. Who will you get?"
+    "title": "PRTS Sync Decompression Analysis",
+    "compatPercent": "Resonance Index",
+    "cpText_high": "Your originium signatures are in perfect sync — like two halves of a single operator on the field.",
+    "cpText_mid": "Divergent signature patterns that cover each other's blind spots precisely.",
+    "cpText_low": "Your signatures are far apart — but the deadliest combinations often come from the most unexpected matches.",
+    "challengeHint": "PRTS decompression protocol matched me with {op}. What's your result?"
   },
   "identityArchive": {
-    "title": "R.I. Personnel Archive",
+    "title": "R.I. Personnel Dossier",
     "fileNo": "File No.",
     "assessment": "Personnel Assessment"
   },

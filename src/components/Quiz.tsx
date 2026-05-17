@@ -8,6 +8,8 @@ interface QuizProps {
   currentQ: number;
   onAnswer: (dim: number, val: number) => void;
   onPrev: () => void;
+  corruptionLevel?: number;
+  dimWarning?: boolean;
 }
 
 const labels = ['A', 'B', 'C', 'D'];
@@ -21,10 +23,19 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
+export default function Quiz({ currentQ, onAnswer, onPrev, corruptionLevel = 0, dimWarning = false }: QuizProps) {
   const { t } = useTranslation();
   const question: Question = QUESTIONS[currentQ];
   const progress = ((currentQ + 1) / QUESTIONS.length) * 100;
+  const level = Math.min(3, Math.floor(corruptionLevel));
+
+  // Corruption effect: garbled text
+  const corruptText = (txt: string, severity: number) => {
+    if (severity === 0) return txt;
+    const chars = txt.split('');
+    const rate = severity * 0.25;
+    return chars.map(c => Math.random() < rate ? '█' : c).join('');
+  };
 
   // Shuffle options once per question to prevent A=3,B=2,C=1,D=0 pattern
   const shuffledOpts = useMemo(() => shuffle(question.opts), [question]);
@@ -74,11 +85,17 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3 }}
           >
+            {dimWarning && (
+              <motion.div initial={{ opacity: 0, y: -4 }} animate={{ opacity: 1, y: 0 }}
+                className="mb-3 px-3 py-2 border border-accent/30 bg-accent-dim/10 rounded text-xs text-accent font-mono tracking-wider">
+                ⚠ 数据偏斜——建议重新校准
+              </motion.div>
+            )}
             <div className="mb-1 font-mono text-[0.55rem] tracking-[0.2em] text-warm-dim/50">
               ⌥ #{String(currentQ + 1).padStart(2, '0')}
             </div>
             <p className="text-lg font-medium leading-relaxed text-warm-white mb-8">
-              {question.text}
+              {corruptText(question.text, level >= 2 ? 0.3 : 0)}
             </p>
 
             <div className="flex flex-col gap-3">
@@ -91,12 +108,19 @@ export default function Quiz({ currentQ, onAnswer, onPrev }: QuizProps) {
                   whileHover={{ scale: 1.005 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => handleSelect(opt.dim, opt.val)}
-                  className="flex items-start gap-3 w-full p-4 bg-white/5 border border-white/10 text-sm text-left leading-relaxed cursor-pointer transition-all duration-200 hover:bg-white/[0.08] hover:border-white/20 active:bg-white/[0.12]"
+                  className={`flex items-start gap-3 w-full p-4 border text-sm text-left leading-relaxed cursor-pointer transition-all duration-200 active:bg-white/[0.12] ${
+                    level >= 1
+                      ? 'bg-accent-dim/10 border-accent/30 hover:bg-accent-dim/20 hover:border-accent/40'
+                      : 'bg-white/5 border-white/10 hover:bg-white/[0.08] hover:border-white/20'
+                  }`}
+                  style={level >= 3 ? { borderColor: '#4A8FE4', background: 'rgba(74,143,228,0.05)' } : undefined}
                 >
                   <span className="font-serif-en italic text-sm text-warm-dim min-w-[1.2rem] shrink-0">
-                    {labels[i]}
+                    {level >= 3 ? '▶' : labels[i]}
                   </span>
-                  <span className="text-warm-white/90">{opt.txt}</span>
+                  <span className="text-warm-white/90">
+                    {level >= 2 ? corruptText(opt.txt, 0.4) : level >= 1 ? corruptText(opt.txt, 0.15) : opt.txt}
+                  </span>
                 </motion.button>
               ))}
             </div>
