@@ -3,7 +3,7 @@
 > **战场上的选择，照见你灵魂的形状。**  
 > 十五道战术情境题，找到与你灵魂共振的那位罗德岛干员。
 
-[![Deploy to GitHub Pages](https://github.com/oldking-yes/arknights-personality-v2/actions/workflows/deploy.yml/badge.svg)](https://github.com/oldking-yes/arknights-personality-v2/actions/workflows/deploy.yml)
+[![Deploy to GitHub Pages](https://github.com/ryan-flow/arknights-personality-v2/actions/workflows/deploy.yml/badge.svg)](https://github.com/ryan-flow/arknights-personality-v2/actions/workflows/deploy.yml)
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
 ![TypeScript](https://img.shields.io/badge/TypeScript-6-3178C6?logo=typescript)
 ![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite)
@@ -13,7 +13,7 @@
 
 ## ✨ 在线体验
 
-**[https://oldking-yes.github.io/arknights-personality-v2/](https://oldking-yes.github.io/arknights-personality-v2/)**
+**[https://ryanflow.cloud/](https://ryanflow.cloud/)**
 
 ---
 
